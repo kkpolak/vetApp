@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
+  <title>Visits</title>
+</head>
+<body>
+<div th:switch="${visits}" class="container my-5">
+  <h2 th:case="null">No visits yet!</h2>
+  <div th:case="*">
+    <h2>Visits <span th:text="${#lists.size(visits)}">2</span></h2>
+    <table class="table">
+      <thead>
+      <tr>
+        <th>Start time</th>
+        <th>Duration</th>
+        <th>Animal</th>
+        <th>Status</th>
+        <th>Price</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="visit : ${visits}">
+        <td th:text="${visit.startTime}"></td>
+        <td th:text="${visit.duration}"></td>
+        <td th:text="${visit.animal}"></td>
+        <td th:text="${visit.status}"></td>
+        <td th:text="${visit.price}"></td>
+        <!--                <td><a th:href="@{/edit/{id}(id=${user.id})}">Edit</a></td>-->
+        <!--                <td><a th:href="@{/delete/{id}(id=${user.id})}">Delete</a></td>-->
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <!--    <p><a href="/signup">Add a new user</a></p>-->
+</div>
+</body>
+</html>
