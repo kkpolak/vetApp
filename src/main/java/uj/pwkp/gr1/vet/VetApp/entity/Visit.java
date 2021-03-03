@@ -10,15 +10,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.Setter;
 import org.hibernate.annotations.TypeDef;
 
 @Data
 @AllArgsConstructor
-//@Builder
+@Builder
 @Entity(name = "visits")
 @TypeDef(typeClass = PostgreSQLIntervalType.class, defaultForType = Duration.class)
 public class Visit {

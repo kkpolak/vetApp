@@ -11,12 +11,8 @@ import uj.pwkp.gr1.vet.VetApp.service.VisitService;
 @RequestMapping("/ui")
 public class VisitsThymeController {
 
-  private final VisitService visitsService;
-
   @Autowired
-  public VisitsThymeController(VisitService visitsService) {
-    this.visitsService = visitsService;
-  }
+  private VisitService visitsService;
 
   @GetMapping("/visits")
   public String showAllVisits(Model model) {

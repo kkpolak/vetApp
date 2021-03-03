@@ -14,32 +14,40 @@ import uj.pwkp.gr1.vet.VetApp.service.VisitService;
 @RequestMapping(path = "/api/visits")
 public class VisitsRestController {
 
-  private final VisitService visitsService;
-
   @Autowired
-  public VisitsRestController(VisitService visitsService) {
-    this.visitsService = visitsService;
-  }
+  private VisitService visitsService;
 
   @GetMapping(path="{id}")
   public ResponseEntity<?> getVisit(@PathVariable int id) {
     return visitsService.getVisitById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
   }
 
-  @GetMapping
+  @GetMapping(path = "/all")
   public List<Visit> getAllVisits() {
     return visitsService.getAllVisits();
   }
 
-  @PostMapping()
+  @PostMapping(path = "/create")
   public ResponseEntity<?> createVisit(@RequestBody VisitRequest visitReq) {
     var result = visitsService.createVisit(visitReq);
     return result.map(this::visitCreationResultToBadRequest, this::visitToResult);
   }
 
-  @DeleteMapping(path = "/{id}")
+  @DeleteMapping(path = "/delete/{id}")
   ResponseEntity<?> delete(@PathVariable int id) {
     var result = visitsService.delete(id);
+    return result.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+  }
+
+  @PatchMapping(path = "/update/{id}/{status}")
+  ResponseEntity<?> updateStatus(@PathVariable("id") int id, @PathVariable("status") String status) {
+    Status newStatus;
+    try {
+      newStatus = Status.valueOf(status);
+    } catch (Exception e) {
+      return ResponseEntity.badRequest().body("{\"reason\": \"Unknown status\"}");
+    }
+    var result = visitsService.updateVisitStatus(id, newStatus);
     return result.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
   }
 
@@ -56,18 +64,6 @@ public class VisitsRestController {
       default:
         return ResponseEntity.badRequest().body("{\"reason\": \"Unknown.\"}");
     }
-  }
-
-  @PatchMapping(path = "/update/{id}/{status}")
-  ResponseEntity<?> updateStatus(@PathVariable("id") int id, @PathVariable("status") String status) {
-    Status newStatus;
-    try {
-      newStatus = Status.valueOf(status);
-    } catch (Exception e) {
-      return ResponseEntity.badRequest().body("{\"reason\": \"Unknown status\"}");
-    }
-    var result = visitsService.updateVisitStatus(id, newStatus);
-    return result.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
   }
 }
 

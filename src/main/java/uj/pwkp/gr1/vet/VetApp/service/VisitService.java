@@ -17,12 +17,8 @@ import uj.pwkp.gr1.vet.VetApp.util.OpResult;
 @Service
 public class VisitService {
 
-  private final VisitRepository visitRepository;
-
   @Autowired
-  public VisitService(VisitRepository visitRepository) {
-    this.visitRepository = visitRepository;
-  }
+  private VisitRepository visitRepository;
 
   public List<Visit> getAllVisits() {
     return visitRepository.findAll();
@@ -34,8 +30,9 @@ public class VisitService {
     } else {
       Visit v;
       try {
-        v = visitRepository.save(Visit.newVisit(req.getStartTime(), req.getDuration(), req.getAnimal(), req.getPrice()));
-      } catch(Exception e) {
+        v = visitRepository.save(
+            Visit.newVisit(req.getStartTime(), req.getDuration(), req.getAnimal(), req.getPrice()));
+      } catch (Exception e) {
         return OpResult.fail(VisitCreationResult.REPOSITORY_PROBLEM);
       }
       return OpResult.success(v);
@@ -43,19 +40,18 @@ public class VisitService {
   }
 
   private boolean dateAvailable(LocalDateTime startTime, Duration duration) {
-    List<Visit> overlaps = visitRepository.overlaps(startTime, startTime.plusMinutes(duration.toMinutes()));
+    List<Visit> overlaps = visitRepository
+        .overlaps(startTime, startTime.plusMinutes(duration.toMinutes()));
     overlaps.forEach(System.out::println);
     return overlaps.size() == 0;
   }
 
   public Optional<Visit> delete(int id) {
     var visit = visitRepository.findById(id);
-    if (visit.isPresent()) {
+    return Optional.ofNullable(visit).map(v -> {
       visitRepository.deleteById(visit.get().getId());
-      return visit;
-    } else {
-      return Optional.empty();
-    }
+      return v;
+    }).orElseGet(Optional::empty);
   }
 
   public Optional<Visit> getVisitById(int id) {
