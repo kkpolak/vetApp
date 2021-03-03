@@ -29,7 +29,12 @@ public class VisitService {
     if (!dateAvailable(req.getStartTime(), req.getDuration())) {
       return OpResult.fail(VisitCreationResult.OVERLAP);
     } else {
-      Visit v = visitRepository.save(Visit.newVisit(req.getStartTime(), req.getDuration(), req.getAnimal(), req.getPrice()));
+      Visit v;
+      try {
+        v = visitRepository.save(Visit.newVisit(req.getStartTime(), req.getDuration(), req.getAnimal(), req.getPrice()));
+      } catch(Exception e) {
+        return OpResult.fail(VisitCreationResult.REPOSITORY_PROBLEM);
+      }
       return OpResult.success(v);
     }
   }
@@ -40,13 +45,13 @@ public class VisitService {
     return overlaps.size() == 0;
   }
 
-  public boolean delete(int id) {
+  public Optional<Visit> delete(int id) {
     var visit = visitRepository.findById(id);
     if (visit.isPresent()) {
       visitRepository.deleteById(visit.get().getId());
-      return true;
+      return visit;
     } else {
-      return false;
+      return Optional.empty();
     }
   }
 

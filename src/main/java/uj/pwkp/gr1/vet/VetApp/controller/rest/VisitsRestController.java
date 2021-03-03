@@ -43,8 +43,9 @@ public class VisitsRestController {
   }
 
   @DeleteMapping(path = "/{id}")
-  void delete(@PathVariable int id) {
-    visitsService.delete(id);
+  ResponseEntity<?> delete(@PathVariable int id) {
+    var result = visitsService.delete(id);
+    return result.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
   }
 
   private ResponseEntity<?> visitToResult(Visit visit) {
