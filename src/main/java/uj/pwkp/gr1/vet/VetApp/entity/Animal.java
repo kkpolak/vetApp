@@ -6,5 +6,9 @@ public enum Animal {
   CAT,
   HAMSTER,
   RAT,
-  GUINEA_PIG
+  GUINEA_PIG,
+  RABBIT,
+  FISH,
+  TURTLE,
+  LIZARD
 }
