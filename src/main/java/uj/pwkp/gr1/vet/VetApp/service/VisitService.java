@@ -6,6 +6,8 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import javax.validation.constraints.NotNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uj.pwkp.gr1.vet.VetApp.controller.rest.VisitRequest;
@@ -14,6 +16,7 @@ import uj.pwkp.gr1.vet.VetApp.entity.Visit;
 import uj.pwkp.gr1.vet.VetApp.repository.VisitRepository;
 import uj.pwkp.gr1.vet.VetApp.util.OpResult;
 
+@Slf4j
 @Service
 public class VisitService {
 
@@ -46,15 +49,15 @@ public class VisitService {
     return overlaps.size() == 0;
   }
 
-  public Optional<Visit> delete(int id) {
+  public Optional<Visit> delete(@NotNull int id) {
     var visit = visitRepository.findById(id);
     return Optional.ofNullable(visit).map(v -> {
-      visitRepository.deleteById(visit.get().getId());
+      visitRepository.deleteById(v.get().getId());
       return v;
     }).orElseGet(Optional::empty);
   }
 
-  public Optional<Visit> getVisitById(int id) {
+  public Optional<Visit> getVisitById(@NotNull int id) {
     return visitRepository.findById(id);
   }
 
@@ -62,13 +65,15 @@ public class VisitService {
     var visit = visitRepository.findById(id);
     if (visit.isPresent()) {
       try {
-        System.out.println("Updating DB");
+        //System.out.println("Updating DB");
+        log.info("Updating DB");
         visitRepository.updateStatus(id, status);
       } catch (Exception e) {
         System.out.println(e.fillInStackTrace());
         return Optional.empty();
       }
-      System.out.println("Succ to update DB");
+      //System.out.println("Succ to update DB");
+      log.info("DB update success");
       return visit;
     } else {
       return Optional.empty();

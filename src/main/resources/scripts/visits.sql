@@ -26,3 +26,5 @@ drop table visits;
 --sprawdzic czy dziala
 --junit testy
 --na podstawie testow zrobic jakies updaty
+
+--dodanie loggera lombokowego https://www.baeldung.com/spring-boot-logging
