@@ -44,8 +44,4 @@ public class Visit {
     price = null;
   }
 
-  public static Visit newVisit(LocalDateTime startTime, Duration duration, Animal animal,
-      BigDecimal price) {
-    return new Visit(-1, startTime, duration, animal, Status.PLANNED, price);
-  }
 }

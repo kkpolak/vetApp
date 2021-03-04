@@ -34,7 +34,14 @@ public class VisitService {
       Visit v;
       try {
         v = visitRepository.save(
-            Visit.newVisit(req.getStartTime(), req.getDuration(), req.getAnimal(), req.getPrice()));
+            Visit.builder()
+                .id(-1)
+                .startTime(req.getStartTime())
+                .duration(req.getDuration())
+                .animal(req.getAnimal())
+                .status(Status.PLANNED)
+                .price(req.getPrice())
+                .build());
       } catch (Exception e) {
         return OpResult.fail(VisitCreationResult.REPOSITORY_PROBLEM);
       }
