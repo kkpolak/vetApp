@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import javax.validation.constraints.NotNull;
+
+import io.vavr.control.Either;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,9 +29,9 @@ public class VisitService {
     return visitRepository.findAll();
   }
 
-  public OpResult<VisitCreationResult, Visit> createVisit(VisitRequest req) {
+  public Either<VisitCreationResult, Visit> createVisit(VisitRequest req) {
     if (!dateAvailable(req.getStartTime(), req.getDuration())) {
-      return OpResult.fail(VisitCreationResult.OVERLAP);
+      return Either.left(VisitCreationResult.OVERLAP);//OpResult.fail(VisitCreationResult.OVERLAP);
     } else {
       Visit v;
       try {
@@ -43,9 +45,9 @@ public class VisitService {
                 .price(req.getPrice())
                 .build());
       } catch (Exception e) {
-        return OpResult.fail(VisitCreationResult.REPOSITORY_PROBLEM);
+        return Either.left(VisitCreationResult.REPOSITORY_PROBLEM);//OpResult.fail(VisitCreationResult.REPOSITORY_PROBLEM);
       }
-      return OpResult.success(v);
+      return Either.right(v);//OpResult.success(v);
     }
   }
 

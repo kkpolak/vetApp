@@ -30,7 +30,7 @@ public class VisitsRestController {
   @PostMapping(path = "/create")
   public ResponseEntity<?> createVisit(@RequestBody VisitRequest visitReq) {
     var result = visitsService.createVisit(visitReq);
-    return result.map(this::visitCreationResultToBadRequest, this::visitToResult);
+    return result.isLeft() ? visitCreationResultToBadRequest(result.left().get()) : visitToResult(result.right().get());
   }
 
   @DeleteMapping(path = "/delete/{id}")
