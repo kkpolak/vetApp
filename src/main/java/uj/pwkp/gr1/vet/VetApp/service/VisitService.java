@@ -16,7 +16,6 @@ import uj.pwkp.gr1.vet.VetApp.controller.rest.VisitRequest;
 import uj.pwkp.gr1.vet.VetApp.entity.Status;
 import uj.pwkp.gr1.vet.VetApp.entity.Visit;
 import uj.pwkp.gr1.vet.VetApp.repository.VisitRepository;
-import uj.pwkp.gr1.vet.VetApp.util.OpResult;
 
 @Slf4j
 @Service
@@ -45,9 +44,9 @@ public class VisitService {
                 .price(req.getPrice())
                 .build());
       } catch (Exception e) {
-        return Either.left(VisitCreationResult.REPOSITORY_PROBLEM);//OpResult.fail(VisitCreationResult.REPOSITORY_PROBLEM);
+        return Either.left(VisitCreationResult.REPOSITORY_PROBLEM);
       }
-      return Either.right(v);//OpResult.success(v);
+      return Either.right(v);
     }
   }
 
@@ -74,14 +73,12 @@ public class VisitService {
     var visit = visitRepository.findById(id);
     if (visit.isPresent()) {
       try {
-        //System.out.println("Updating DB");
         log.info("Updating DB");
         visitRepository.updateStatus(id, status);
       } catch (Exception e) {
         System.out.println(e.fillInStackTrace());
         return Optional.empty();
       }
-      //System.out.println("Succ to update DB");
       log.info("DB update success");
       return visit;
     } else {
