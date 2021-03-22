@@ -1,9 +1,7 @@
 package uj.pwkp.gr1.vet.VetApp.service;
 
-import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import javax.validation.constraints.NotNull;
@@ -39,7 +37,7 @@ public class VisitService {
                 .id(-1)
                 .startTime(req.getStartTime())
                 .duration(req.getDuration())
-                .animal(req.getAnimal())
+                .animalType(req.getAnimalType())
                 .status(Status.PLANNED)
                 .price(req.getPrice())
                 .build());
