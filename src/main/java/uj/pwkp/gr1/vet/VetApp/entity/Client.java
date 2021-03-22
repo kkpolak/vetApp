@@ -1,5 +1,7 @@
 package uj.pwkp.gr1.vet.VetApp.entity;
 
+import java.time.Duration;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -21,6 +23,14 @@ public class Client {
 
   private final String firstName;
   private final String lastName;
+
+  protected Client() {
+    id = 0;
+    firstName = "-";
+    lastName = "-";
+  }
+
+  //private final List<Animal> animals;
 
 //  @OneToOne(mappedBy = "animal")
 //  Animal animal;

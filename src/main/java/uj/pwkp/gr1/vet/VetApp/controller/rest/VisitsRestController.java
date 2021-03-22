@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uj.pwkp.gr1.vet.VetApp.controller.rest.request.VisitRequest;
 import uj.pwkp.gr1.vet.VetApp.entity.Status;
 import uj.pwkp.gr1.vet.VetApp.entity.Visit;
 import uj.pwkp.gr1.vet.VetApp.service.VisitCreationResult;
@@ -34,7 +35,7 @@ public class VisitsRestController {
   }
 
   @DeleteMapping(path = "/delete/{id}")
-  ResponseEntity<?> delete(@PathVariable int id) {
+  ResponseEntity<?> deleteVisit(@PathVariable int id) {
     var result = visitsService.delete(id);
     return result.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
   }

@@ -15,11 +15,19 @@ import javax.transaction.Transactional;
 @Repository
 public interface VisitRepository extends JpaRepository<Visit, Integer> {
 
-  @Query("select v from visits v where (:timeFrom >= v.startTime and :timeFrom < (v.startTime + v.duration)) or (:timeTo > v.startTime and :timeTo <= (v.startTime + v.duration))")
+//  @Query("select v from visits v where (:timeFrom >= v.startTime and :timeFrom < (v.startTime + v.duration)) or (:timeTo > v.startTime and :timeTo <= (v.startTime + v.duration))")
+//  List<Visit> overlaps(LocalDateTime timeFrom, LocalDateTime timeTo);
+//
+//  @Transactional
+//  @Modifying
+//  @Query("update visits v set v.status = :status where v.id = :id")
+//  void updateStatus(@Param(value = "id") Integer id, @Param(value = "status") Status status);
+
+  @Query("select v from visit v where (:timeFrom >= v.startTime and :timeFrom < (v.startTime + v.duration)) or (:timeTo > v.startTime and :timeTo <= (v.startTime + v.duration))")
   List<Visit> overlaps(LocalDateTime timeFrom, LocalDateTime timeTo);
 
   @Transactional
   @Modifying
-  @Query("update visits v set v.status = :status where v.id = :id")
+  @Query("update visit v set v.status = :status where v.id = :id")
   void updateStatus(@Param(value = "id") Integer id, @Param(value = "status") Status status);
 }

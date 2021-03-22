@@ -27,7 +27,19 @@ public class Vet {
   private final String lastName;
   private final String photo;
 
-  private final LocalDateTime startTime;
+  private final LocalDateTime admissionStart;
+  private final LocalDateTime admissionEnd;
   @Column(columnDefinition = "interval")
   private final Duration duration;
+
+  protected Vet() {
+    id = 0;
+    firstName = "-";
+    lastName = "-";
+    photo = "-";
+    admissionEnd = null;
+    admissionStart = null;
+    duration = Duration.ZERO;
+  }
+
 }

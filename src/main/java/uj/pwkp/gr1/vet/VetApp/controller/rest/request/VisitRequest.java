@@ -1,4 +1,4 @@
-package uj.pwkp.gr1.vet.VetApp.controller.rest;
+package uj.pwkp.gr1.vet.VetApp.controller.rest.request;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -12,4 +12,6 @@ public class VisitRequest {
   private final Duration duration;
   private final AnimalType animalType;
   private final BigDecimal price;
+  private final int vetId;
+  private final String description;
 }
