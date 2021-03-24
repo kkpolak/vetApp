@@ -65,13 +65,13 @@ public class VisitService {
   private boolean dateAvailable(LocalDateTime startTime, Duration duration) {
     List<Visit> overlaps = visitRepository
         .overlaps(startTime, startTime.plusMinutes(duration.toMinutes()));
-    overlaps.forEach(System.out::println);
-    return overlaps.size() == 0;
+    overlaps.forEach(x -> log.info(x.toString()));
+    return overlaps.isEmpty();
   }
 
   public Optional<Visit> delete(@NotNull int id) {
     var visit = visitRepository.findById(id);
-    return Optional.ofNullable(visit).map(v -> {
+    return Optional.of(visit).map(v -> {
       visitRepository.deleteById(v.get().getId());
       return v;
     }).orElseGet(() -> {

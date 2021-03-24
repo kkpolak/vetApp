@@ -37,8 +37,8 @@ public class VetRestController {
   @PostMapping(path = "/create")
   public ResponseEntity<?> createVet(@RequestBody VetRequest vetRequest) {
     var result = vetService.createVet(vetRequest);
-    return result.isLeft() ? ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("ERROR")
-        : ResponseEntity.status(HttpStatus.CREATED).body(result);
+    return result.isLeft() ? ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result.left().get())
+        : ResponseEntity.status(HttpStatus.CREATED).body(result.right().get());
   }
 
   @DeleteMapping(path = "/delete/{id}")

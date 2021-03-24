@@ -28,7 +28,6 @@ public class VetService {
   }
 
   public Either<String, Vet> createVet(VetRequest req) {
-    System.out.println("->>>>>" + req.toString() + "<------");
     Vet v;
     try {
       v = vetRepository.save(

@@ -39,8 +39,8 @@ public class AnimalRestController {
   @PostMapping(path = "/create")
   public ResponseEntity<?> createAnimal(@RequestBody AnimalRequest animalRequest) {
     var result = animalService.createAnimal(animalRequest);
-    return result.isLeft() ? ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("error")
-        : ResponseEntity.status(HttpStatus.CREATED).body(result);
+    return result.isLeft() ? ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result.left().get())
+        : ResponseEntity.status(HttpStatus.CREATED).body(result.right().get());
   }
 
   @DeleteMapping(path = "/delete/{id}")

@@ -36,12 +36,12 @@ public class ClientRestController {
   @PostMapping(path = "/create")
   public ResponseEntity<?> createClient(@RequestBody ClientRequest clientRequest) {
     var result = clientService.createClient(clientRequest);
-    return result.isLeft() ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result.getLeft())
-        : ResponseEntity.status(HttpStatus.CREATED).body(result);
+    return result.isLeft() ? ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result.left().get())
+        : ResponseEntity.status(HttpStatus.CREATED).body(result.right().get());
   }
 
   @DeleteMapping(path = "/delete/{id}")
-  ResponseEntity<?> deleteClient(@PathVariable int id) {
+  public ResponseEntity<?> deleteClient(@PathVariable int id) {
     var result = clientService.delete(id);
     return result.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
   }
