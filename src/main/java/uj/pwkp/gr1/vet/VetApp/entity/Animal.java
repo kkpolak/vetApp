@@ -21,6 +21,7 @@ public class Animal {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private int id;
+  private String name;
   private LocalDateTime dateOfBirth;
   private AnimalType type;
 

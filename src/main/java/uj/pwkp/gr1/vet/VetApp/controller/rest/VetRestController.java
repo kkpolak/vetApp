@@ -1,11 +1,15 @@
 package uj.pwkp.gr1.vet.VetApp.controller.rest;
 
 import java.util.List;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -45,6 +49,13 @@ public class VetRestController {
   ResponseEntity<?> deleteVet(@PathVariable int id) {
     var result = vetService.delete(id);
     return result.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+  }
+
+  @PatchMapping(path = "update/{vetId}/{visitId}/{description}")
+  public ResponseEntity<?> updateStatusByVet(@PathVariable("vetId") int vetId,
+      @PathVariable("visitId") int visitId, @PathVariable("description") @Size(min = 1) String description) {
+    var result = vetService.changeVisitDescription(vetId,visitId,description);
+    return result.map(ResponseEntity::ok).orElse(ResponseEntity.badRequest().build());
   }
 
 }

@@ -8,9 +8,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uj.pwkp.gr1.vet.VetApp.controller.rest.request.VetRequest;
+import uj.pwkp.gr1.vet.VetApp.entity.Status;
 import uj.pwkp.gr1.vet.VetApp.entity.Vet;
 import uj.pwkp.gr1.vet.VetApp.entity.Visit;
 import uj.pwkp.gr1.vet.VetApp.repository.VetRepository;
+import uj.pwkp.gr1.vet.VetApp.repository.VisitRepository;
 
 @Slf4j
 @Service
@@ -18,6 +20,9 @@ public class VetService {
 
   @Autowired
   private VetRepository vetRepository;
+
+  @Autowired
+  private VisitRepository visitRepository;
 
   public List<Vet> getAllVets() {
     return vetRepository.findAll();
@@ -57,4 +62,34 @@ public class VetService {
       return Optional.empty();
     });
   }
+
+  public Optional<Visit> changeVisitDescription(@NotNull int vetId, @NotNull int visitId,
+      @NotNull String description) {
+    var visit = visitRepository.findById(visitId);
+    var vet = vetRepository.findById(vetId);
+    if (visit.isEmpty()) {
+      log.info("visit not found");
+      return Optional.empty();
+    }
+
+    if (vet.isEmpty()) {
+      log.info("vet not found");
+      return Optional.empty();
+    }
+
+    if (visit.get().getVet().getId() != vetId) {
+      log.info("this vet is not responsible for this visit");
+      return Optional.empty();
+    }
+
+    if (visit.get().getStatus() != Status.PLANNED
+        || visit.get().getStatus() != Status.FINISHED_SUCCESS) {
+      log.info("you cannot change the description of a visit with this status");
+      return Optional.empty();
+    }
+
+    visitRepository.updateDescription(visitId, description);
+    return visit;
+  }
+
 }

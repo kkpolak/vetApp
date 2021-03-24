@@ -14,4 +14,6 @@ public class VisitRequest {
   private final BigDecimal price;
   private final int vetId;
   private final String description;
+  private final int clientId;
+  private final int animalId;
 }

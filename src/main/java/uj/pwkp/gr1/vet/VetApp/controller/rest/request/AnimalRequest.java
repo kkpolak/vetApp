@@ -9,4 +9,5 @@ public class AnimalRequest {
   private final LocalDateTime dateOfBirth;
   private final AnimalType type;
   private final int ownerId;
+  private final String name;
 }

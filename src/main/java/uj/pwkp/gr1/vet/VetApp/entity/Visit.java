@@ -32,12 +32,20 @@ public class Visit {
   private final LocalDateTime startTime;
   @Column(columnDefinition = "interval")
   private final Duration duration;
-  @Column(name = "animalType")
-  private final AnimalType animalType;
+//  @Column(name = "animalType")
+//  private final AnimalType animalType;
   @Column(name = "status")
   private final Status status;
   private final BigDecimal price;
   private String description;
+
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "animal_id", referencedColumnName = "id")
+  private Animal animal;
+
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "client_id", referencedColumnName = "id")
+  private Client client;
 
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "vet_id", referencedColumnName = "id")
@@ -47,9 +55,11 @@ public class Visit {
     id = 0;
     startTime = null;
     duration = Duration.ZERO;
-    animalType = AnimalType.OTHER;
     status = Status.PLANNED;
     price = null;
+    animal = null;
+    client = null;
+    vet = null;
   }
 
 }
