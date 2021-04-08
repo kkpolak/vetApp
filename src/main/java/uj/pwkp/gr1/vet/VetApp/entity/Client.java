@@ -1,12 +1,11 @@
 package uj.pwkp.gr1.vet.VetApp.entity;
 
-import java.time.LocalDateTime;
-import javax.persistence.CascadeType;
+import java.time.Duration;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,17 +14,24 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 @Builder
-@Entity(name = "animal")
-public class Animal {
+@Entity(name = "client")
+public class Client {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private int id;
-  private String name;
-  private LocalDateTime dateOfBirth;
-  private AnimalType type;
+  private final int id;
 
-  @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "owner_id", referencedColumnName = "id")
-  private Client owner;
+  private final String firstName;
+  private final String lastName;
+
+  protected Client() {
+    id = 0;
+    firstName = "-";
+    lastName = "-";
+  }
+
+  //private final List<Animal> animals;
+
+//  @OneToOne(mappedBy = "animal")
+//  Animal animal;
 }

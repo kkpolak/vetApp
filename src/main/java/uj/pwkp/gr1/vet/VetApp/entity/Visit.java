@@ -4,12 +4,15 @@ import com.vladmihalcea.hibernate.type.interval.PostgreSQLIntervalType;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,7 +21,7 @@ import org.hibernate.annotations.TypeDef;
 @Data
 @AllArgsConstructor
 @Builder
-@Entity(name = "visits")
+@Entity(name = "visit")
 @TypeDef(typeClass = PostgreSQLIntervalType.class, defaultForType = Duration.class)
 public class Visit {
 
@@ -29,19 +32,34 @@ public class Visit {
   private final LocalDateTime startTime;
   @Column(columnDefinition = "interval")
   private final Duration duration;
-  @Column(name = "animal")
-  private final Animal animal;
+//  @Column(name = "animalType")
+//  private final AnimalType animalType;
   @Column(name = "status")
   private final Status status;
   private final BigDecimal price;
+  private String description;
+
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "animal_id", referencedColumnName = "id")
+  private Animal animal;
+
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "client_id", referencedColumnName = "id")
+  private Client client;
+
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "vet_id", referencedColumnName = "id")
+  private Vet vet;
 
   protected Visit() {
     id = 0;
     startTime = null;
     duration = Duration.ZERO;
-    animal = Animal.OTHER;
     status = Status.PLANNED;
     price = null;
+    animal = null;
+    client = null;
+    vet = null;
   }
 
 }
