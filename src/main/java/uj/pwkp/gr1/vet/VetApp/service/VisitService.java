@@ -81,7 +81,6 @@ public class VisitService {
       return Either.left(VisitCreationResult.REPOSITORY_PROBLEM);
     }
     return Either.right(v);
-
   }
 
   private boolean dateAvailable(LocalDateTime startTime, Duration duration) {
