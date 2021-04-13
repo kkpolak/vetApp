@@ -16,4 +16,5 @@ public class VisitRequest {
   private final String description;
   private final int clientId;
   private final int animalId;
+  private final int officeId;
 }

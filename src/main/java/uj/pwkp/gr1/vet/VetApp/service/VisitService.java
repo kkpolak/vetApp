@@ -13,16 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import uj.pwkp.gr1.vet.VetApp.controller.rest.request.VisitRequest;
-import uj.pwkp.gr1.vet.VetApp.entity.Animal;
-import uj.pwkp.gr1.vet.VetApp.entity.AnimalType;
-import uj.pwkp.gr1.vet.VetApp.entity.Client;
-import uj.pwkp.gr1.vet.VetApp.entity.Status;
-import uj.pwkp.gr1.vet.VetApp.entity.Vet;
-import uj.pwkp.gr1.vet.VetApp.entity.Visit;
-import uj.pwkp.gr1.vet.VetApp.repository.AnimalRepository;
-import uj.pwkp.gr1.vet.VetApp.repository.ClientRepository;
-import uj.pwkp.gr1.vet.VetApp.repository.VetRepository;
-import uj.pwkp.gr1.vet.VetApp.repository.VisitRepository;
+import uj.pwkp.gr1.vet.VetApp.entity.*;
+import uj.pwkp.gr1.vet.VetApp.repository.*;
 
 @Slf4j
 @Service
@@ -39,6 +31,9 @@ public class VisitService {
 
   @Autowired
   private ClientRepository clientRepository;
+
+  @Autowired
+  private OfficeRepository officeRepository;
 
   public List<Visit> getAllVisits() {
     return visitRepository.findAll();
@@ -65,6 +60,11 @@ public class VisitService {
         return Client.builder().firstName("anonymous").lastName("anonymous").id(req.getClientId())
             .build();
       });
+      Office office = officeRepository.findById(req.getOfficeId()).orElseGet(() -> {
+        log.info(String.format("office with this id: %x was not found", req.getOfficeId()));
+        return Office.builder().name("anonymus").id(req.getOfficeId())
+                .build();
+      });
       v = visitRepository.save(
           Visit.builder()
               .id(-1)
@@ -76,6 +76,7 @@ public class VisitService {
               .description(req.getDescription())
               .vet(vet)
               .client(client)
+              .office(office)
               .build());
     } catch (Exception e) {
       return Either.left(VisitCreationResult.REPOSITORY_PROBLEM);
