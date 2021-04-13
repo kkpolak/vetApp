@@ -30,4 +30,8 @@ public interface VisitRepository extends JpaRepository<Visit, Integer> {
   @Modifying
   @Query("update visit v set v.description = :description where v.id = :id")
   void updateDescription(@Param(value = "id") Integer id, @Param(value = "description") String description);
+
+  @Query("select v from visit v where (v.office.id = :officeId and v.vet.id = :vetId and ((v.startTime between :start and :end) or ((v.startTime + v.duration) between :start and :end))) order by v.startTime"
+  )
+  List<Visit> findVisitsByTimePeriod(LocalDateTime start, LocalDateTime end, int officeId, int vetId);
 }

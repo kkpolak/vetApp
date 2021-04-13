@@ -1,5 +1,6 @@
 package uj.pwkp.gr1.vet.VetApp.controller.rest;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uj.pwkp.gr1.vet.VetApp.controller.rest.request.SearchRequest;
 import uj.pwkp.gr1.vet.VetApp.controller.rest.request.VisitRequest;
 import uj.pwkp.gr1.vet.VetApp.entity.Status;
 import uj.pwkp.gr1.vet.VetApp.entity.Visit;
@@ -83,6 +85,16 @@ public class VisitsRestController {
       default:
         return ResponseEntity.badRequest().body("{\"reason\": \"Unknown.\"}");
     }
+  }
+
+  @PostMapping(path = "/search")
+  public ResponseEntity<?> searchTerms(@RequestBody SearchRequest searchRequest) {
+    LocalDateTime start = searchRequest.getStartTime();
+    LocalDateTime end = searchRequest.getEndTime();
+    int officeId = searchRequest.getOfficeId();
+    int vetId = searchRequest.getVetId();
+    var terms = visitsService.searchTerms(start, end, officeId, vetId);
+    return ResponseEntity.status(HttpStatus.CREATED).body(terms);
   }
 }
 

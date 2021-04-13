@@ -3,8 +3,11 @@ package uj.pwkp.gr1.vet.VetApp.service;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 
 import io.vavr.control.Either;
@@ -13,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import uj.pwkp.gr1.vet.VetApp.controller.rest.request.SearchRequest;
 import uj.pwkp.gr1.vet.VetApp.controller.rest.request.VisitRequest;
 import uj.pwkp.gr1.vet.VetApp.entity.*;
 import uj.pwkp.gr1.vet.VetApp.repository.*;
@@ -92,7 +96,6 @@ public class VisitService {
     List<Visit> overlaps = visitRepository
         .overlaps(startTime, startTime.plusMinutes(duration.toMinutes()), req.getOfficeId(), req.getVetId());
     overlaps.forEach(x -> log.info(x.toString()));
-//    boolean isOfficeAvaliable = !overlaps.stream().anyMatch(x -> req.getOfficeId() == x.getOffice().getId());
     var result = ChronoUnit.MINUTES.between(startTime, LocalDateTime.now());
     return overlaps.isEmpty() && -result > 60;
   }
@@ -150,5 +153,35 @@ public class VisitService {
 
     visitRepository.updateStatus(visitId,newStatus);
     return visit;
+  }
+
+  public List<LocalDateTime> searchTerms(LocalDateTime start, LocalDateTime end, int officeId, int vetId) {
+    List<LocalDateTime> prohibitedTerms = new ArrayList<>();
+    var overlapped = visitRepository.findVisitsByTimePeriod(start, end, officeId, vetId);
+    overlapped.forEach(x -> {
+          prohibitedTerms.add(x.getStartTime());
+          prohibitedTerms.add(x.getStartTime().plus(x.getDuration()));
+        });
+    List<LocalDateTime> slots = new ArrayList<>() ;
+    LocalDateTime x = start;
+    int index = 0;
+    while (x.isBefore(end)) {
+
+      boolean endLoop = index > prohibitedTerms.size() - 1;
+      if(!endLoop && x.isBefore(prohibitedTerms.get(index))) {
+        slots.add(x);
+        x = x.plusMinutes(15);
+      } else if(endLoop) {
+        break;
+      } else {
+        x = prohibitedTerms.get(index + 1);
+        index += 2;
+      }
+    }
+    while (x.isBefore(end)) {
+      slots.add(x);
+      x = x.plusMinutes(15);
+    }
+    return slots;
   }
 }

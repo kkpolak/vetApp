@@ -40,8 +40,8 @@ test {
 	useJUnitPlatform()
 }
 
-flyway {
-	url = 'jdbc:postgresql://localhost:5432/vetAppDB'
-	user = 'postgres'
-	password = 'postgres'
-}
+//flyway {
+//	url = 'jdbc:postgresql://localhost:5432/vetAppDB'
+//	user = 'postgres'
+//	password = 'postgres'
+//}
