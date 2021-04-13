@@ -51,6 +51,10 @@ public class Visit {
   @JoinColumn(name = "vet_id", referencedColumnName = "id")
   private Vet vet;
 
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "office_id", referencedColumnName = "id")
+  private Office office;
+
   protected Visit() {
     id = 0;
     startTime = null;
@@ -60,6 +64,7 @@ public class Visit {
     animal = null;
     client = null;
     vet = null;
+    office = null;
   }
 
 }
