@@ -41,7 +41,7 @@ public class VisitService {
   }
 
   public Either<VisitCreationResult, Visit> createVisit(VisitRequest req) {
-    if (!dateAvailable(req.getStartTime(), req.getDuration())) {
+    if (!dateAvailable(req.getStartTime(), req.getDuration(), req)) {
       return Either.left(VisitCreationResult.OVERLAP);//OpResult.fail(VisitCreationResult.OVERLAP);
     }
     Visit v;
@@ -85,11 +85,14 @@ public class VisitService {
     return Either.right(v);
   }
 
-  private boolean dateAvailable(LocalDateTime startTime, Duration duration) {
+  /*
+  *    added checking for overlapping visits in the office
+   */
+  private boolean dateAvailable(LocalDateTime startTime, Duration duration, VisitRequest req) {
     List<Visit> overlaps = visitRepository
-        .overlaps(startTime, startTime.plusMinutes(duration.toMinutes()));
+        .overlaps(startTime, startTime.plusMinutes(duration.toMinutes()), req.getOfficeId());
     overlaps.forEach(x -> log.info(x.toString()));
-
+//    boolean isOfficeAvaliable = !overlaps.stream().anyMatch(x -> req.getOfficeId() == x.getOffice().getId());
     var result = ChronoUnit.MINUTES.between(startTime, LocalDateTime.now());
     return overlaps.isEmpty() && -result > 60;
   }

@@ -15,8 +15,11 @@ import javax.transaction.Transactional;
 @Repository
 public interface VisitRepository extends JpaRepository<Visit, Integer> {
 
-  @Query("select v from visit v where (:timeFrom >= v.startTime and :timeFrom < (v.startTime + v.duration)) or (:timeTo > v.startTime and :timeTo <= (v.startTime + v.duration))")
-  List<Visit> overlaps(LocalDateTime timeFrom, LocalDateTime timeTo);
+  @Query("select v from visit v where ((v.office.id = :officeId) " +
+          "and ((:timeFrom >= v.startTime and :timeFrom < (v.startTime + v.duration))" +
+          " or (:timeTo > v.startTime and :timeTo <= (v.startTime + v.duration))))"
+  )
+  List<Visit> overlaps(LocalDateTime timeFrom, LocalDateTime timeTo, int officeId);
 
   @Transactional
   @Modifying
