@@ -2,6 +2,7 @@ plugins {
 	id 'org.springframework.boot' version '2.4.3'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
+	id "org.flywaydb.flyway" version "7.7.3"
 }
 
 group = 'uj.pwkp.gr1.vet'
@@ -37,4 +38,10 @@ dependencies {
 
 test {
 	useJUnitPlatform()
+}
+
+flyway {
+	url = 'jdbc:postgresql://localhost:5432/vetAppDB'
+	user = 'postgres'
+	password = 'postgres'
 }

@@ -4,7 +4,7 @@ CREATE TABLE if not exists public.client
     first_name character varying(255) COLLATE pg_catalog."default",
     last_name character varying(255) COLLATE pg_catalog."default",
     CONSTRAINT client_pkey PRIMARY KEY (id)
-)
+    );
 CREATE TABLE if not exists public.animal
 (
     id integer NOT NULL,
@@ -14,10 +14,10 @@ CREATE TABLE if not exists public.animal
     owner_id integer,
     CONSTRAINT animal_pkey PRIMARY KEY (id),
     CONSTRAINT fkitahe3ljymr5ulhf8oy8sk6p9 FOREIGN KEY (owner_id)
-        REFERENCES public.client (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
-)
+    REFERENCES public.client (id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    );
 
 CREATE TABLE public.vet
 (
@@ -29,7 +29,7 @@ CREATE TABLE public.vet
     last_name character varying(255) COLLATE pg_catalog."default",
     photo character varying(255) COLLATE pg_catalog."default",
     CONSTRAINT vet_pkey PRIMARY KEY (id)
-)
+);
 
 CREATE TABLE public.visit
 (
@@ -55,7 +55,4 @@ CREATE TABLE public.visit
         REFERENCES public.animal (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
-)
-
-INSERT INTO client(id, first_name, last_name)
-VALUES (1, 'Adam', 'Hgw');
+);
