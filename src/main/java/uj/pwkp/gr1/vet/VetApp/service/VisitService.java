@@ -90,7 +90,7 @@ public class VisitService {
    */
   private boolean dateAvailable(LocalDateTime startTime, Duration duration, VisitRequest req) {
     List<Visit> overlaps = visitRepository
-        .overlaps(startTime, startTime.plusMinutes(duration.toMinutes()), req.getOfficeId());
+        .overlaps(startTime, startTime.plusMinutes(duration.toMinutes()), req.getOfficeId(), req.getVetId());
     overlaps.forEach(x -> log.info(x.toString()));
 //    boolean isOfficeAvaliable = !overlaps.stream().anyMatch(x -> req.getOfficeId() == x.getOffice().getId());
     var result = ChronoUnit.MINUTES.between(startTime, LocalDateTime.now());
