@@ -8,6 +8,7 @@ import java.util.Optional;
 import javax.validation.constraints.NotNull;
 
 import io.vavr.control.Either;
+import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -90,8 +91,7 @@ public class VisitService {
     overlaps.forEach(x -> log.info(x.toString()));
 
     var result = ChronoUnit.MINUTES.between(startTime, LocalDateTime.now());
-
-    return overlaps.isEmpty() && result > 60;
+    return overlaps.isEmpty() && -result > 60;
   }
 
   public Optional<Visit> delete(@NotNull int id) {

@@ -28,4 +28,11 @@ public class Animal {
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "owner_id", referencedColumnName = "id")
   private Client owner;
+
+  protected Animal() {
+    id = 0;
+    name = "-";
+    dateOfBirth = LocalDateTime.now();
+    type = null;
+  }
 }

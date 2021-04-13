@@ -4,6 +4,8 @@ import java.util.List;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import uj.pwkp.gr1.vet.VetApp.entity.Visit;
 import uj.pwkp.gr1.vet.VetApp.service.VisitCreationResult;
 import uj.pwkp.gr1.vet.VetApp.service.VisitService;
 
+@Slf4j
 @RestController
 @RequestMapping(path = "/api/visits")
 public class VisitsRestController {
