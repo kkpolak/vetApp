@@ -26,6 +26,7 @@ dependencies {
 	implementation group: 'io.springfox', name: 'springfox-swagger2', version: '3.0.0'
 	implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '3.0.0'
 	implementation group: 'io.springfox', name: 'springfox-boot-starter', version: '3.0.0'
+	implementation group: 'org.springframework.hateoas', name: 'spring-hateoas', version: '1.2.5'
 	implementation 'com.vladmihalcea:hibernate-types-52:2.10.2'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
@@ -33,7 +34,6 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	compile 'io.vavr:vavr-beanvalidation2:0.10.0'
 	compile "org.flywaydb:flyway-core:7.7.3"
-
 }
 
 test {

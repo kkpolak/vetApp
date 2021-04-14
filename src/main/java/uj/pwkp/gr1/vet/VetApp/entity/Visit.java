@@ -17,13 +17,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import org.hibernate.annotations.TypeDef;
+import org.springframework.hateoas.RepresentationModel;
 
 @Data
 @AllArgsConstructor
 @Builder
 @Entity(name = "visit")
 @TypeDef(typeClass = PostgreSQLIntervalType.class, defaultForType = Duration.class)
-public class Visit {
+public class Visit extends RepresentationModel<Visit> {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -32,8 +33,6 @@ public class Visit {
   private final LocalDateTime startTime;
   @Column(columnDefinition = "interval")
   private final Duration duration;
-//  @Column(name = "animalType")
-//  private final AnimalType animalType;
   @Column(name = "status")
   private final Status status;
   private final BigDecimal price;

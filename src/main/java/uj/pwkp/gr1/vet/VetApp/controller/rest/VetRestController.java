@@ -1,10 +1,15 @@
 package uj.pwkp.gr1.vet.VetApp.controller.rest;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+
 import java.util.List;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,35 +32,67 @@ public class VetRestController {
   @Autowired
   private VetService vetService;
 
-  @GetMapping(path = "{id}")
+  //@GetMapping(path = "/{id}", produces = "application/hal+json")
+  @GetMapping(path = "/{id}", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
   public ResponseEntity<?> getVet(@PathVariable int id) {
-    return vetService.getVetById(id).map(ResponseEntity::ok)
-        .orElse(ResponseEntity.notFound().build());
+    var vet = vetService.getVetById(id);
+    if (vet.isEmpty()) {
+      return ResponseEntity.notFound().build();
+    }
+    var result = vet.get();
+    Link linkVet = linkTo(VetRestController.class).slash(id).withSelfRel();
+    result.add(linkVet);
+    return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  @GetMapping(path = "/all")
-  public List<Vet> getAllVets() {
-    return vetService.getAllVets();
+  //@GetMapping(path = "/all", produces = "application/hal+json")
+  @GetMapping(path = "/all", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
+  public CollectionModel<Vet> getAllVets() {
+    var vets = vetService.getAllVets();
+    vets.forEach(v -> v.add(linkTo(VetRestController.class).slash(v.getId()).withSelfRel()));
+    Link link = linkTo(VetRestController.class).withSelfRel();
+    return CollectionModel.of(vets, link);
   }
 
-  @PostMapping(path = "/create")
+  //@PostMapping(path = "/create", produces = "application/hal+json")
+  @PostMapping(path = "/create", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
   public ResponseEntity<?> createVet(@RequestBody VetRequest vetRequest) {
-    var result = vetService.createVet(vetRequest);
-    return result.isLeft() ? ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result.left().get())
-        : ResponseEntity.status(HttpStatus.CREATED).body(result.right().get());
+    var vet = vetService.createVet(vetRequest);
+    if (vet.isLeft()) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body(vet.left().get());
+    }
+    var result = vet.get();
+    Link linkVet = linkTo(VetRestController.class).slash(result.getId()).withSelfRel();
+    result.add(linkVet);
+    return ResponseEntity.status(HttpStatus.CREATED).body(result);
   }
 
-  @DeleteMapping(path = "/delete/{id}")
+  //@DeleteMapping(path = "/delete/{id}", produces = "application/hal+json")
+  @DeleteMapping(path = "/delete/{id}", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
   ResponseEntity<?> deleteVet(@PathVariable int id) {
-    var result = vetService.delete(id);
-    return result.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    var vet = vetService.delete(id);
+    if (vet.isEmpty()) {
+      return ResponseEntity.notFound().build();
+    }
+    var result = vet.get();
+    Link linkVet = linkTo(VetRestController.class).slash(id).withSelfRel();
+    result.add(linkVet);
+    return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
   @PatchMapping(path = "update/{vetId}/{visitId}/{description}")
   public ResponseEntity<?> updateStatusByVet(@PathVariable("vetId") int vetId,
-      @PathVariable("visitId") int visitId, @PathVariable("description") @Size(min = 1) String description) {
-    var result = vetService.changeVisitDescription(vetId,visitId,description);
-    return result.map(ResponseEntity::ok).orElse(ResponseEntity.badRequest().build());
+      @PathVariable("visitId") int visitId,
+      @PathVariable("description") @Size(min = 1) String description) {
+    var vet = vetService.changeVisitDescription(vetId, visitId, description);
+    if (vet.isEmpty()) {
+      return ResponseEntity.notFound().build();
+    }
+    var result = vet.get();
+    Link linkVet = linkTo(VetRestController.class).slash(result.getId()).withSelfRel();
+    result.add(linkVet);
+    return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
 }

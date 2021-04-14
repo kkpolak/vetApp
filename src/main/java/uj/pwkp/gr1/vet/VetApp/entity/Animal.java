@@ -11,12 +11,13 @@ import javax.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.hateoas.RepresentationModel;
 
 @Data
 @AllArgsConstructor
 @Builder
 @Entity(name = "animal")
-public class Animal {
+public class Animal extends RepresentationModel<Animal> {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

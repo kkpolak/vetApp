@@ -49,7 +49,9 @@ public class AnimalService {
           Animal.builder()
               .dateOfBirth(req.getDateOfBirth())
               .type(req.getType())
-              .owner(client).build());
+              .owner(client)
+              .name(req.getName())
+              .build());
     } catch (Exception e) {
       return Either.left("vet creation error");
     }

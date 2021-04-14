@@ -8,12 +8,13 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import org.springframework.hateoas.RepresentationModel;
 
 @Data
 @AllArgsConstructor
 @Builder
 @Entity
-public class Office {
+public class Office extends RepresentationModel<Office> {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private final int id;

@@ -12,13 +12,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import org.hibernate.annotations.TypeDef;
+import org.springframework.hateoas.RepresentationModel;
 
 @Data
 @AllArgsConstructor
 @Builder
 @Entity(name = "vet")
 @TypeDef(typeClass = PostgreSQLIntervalType.class, defaultForType = Duration.class)
-public class Vet {
+public class Vet extends RepresentationModel<Vet> {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private final int id;
