@@ -13,7 +13,7 @@ import org.springframework.hateoas.RepresentationModel;
 @Data
 @AllArgsConstructor
 @Builder
-@Entity
+@Entity(name = "office")
 public class Office extends RepresentationModel<Office> {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

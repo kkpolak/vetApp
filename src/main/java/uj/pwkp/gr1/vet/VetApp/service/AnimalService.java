@@ -53,7 +53,7 @@ public class AnimalService {
               .name(req.getName())
               .build());
     } catch (Exception e) {
-      return Either.left("vet creation error");
+      return Either.left("animal creation error");
     }
 
     return Either.right(a);

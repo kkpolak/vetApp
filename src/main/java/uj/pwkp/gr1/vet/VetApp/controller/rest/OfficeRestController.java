@@ -2,6 +2,7 @@ package uj.pwkp.gr1.vet.VetApp.controller.rest;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
@@ -13,6 +14,7 @@ import uj.pwkp.gr1.vet.VetApp.controller.rest.request.OfficeRequest;
 import uj.pwkp.gr1.vet.VetApp.entity.Office;
 import uj.pwkp.gr1.vet.VetApp.service.OfficeService;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -46,12 +48,12 @@ public class OfficeRestController {
 
   //@PostMapping(path = "/create", produces = "application/hal+json")
   @PostMapping(path = "/create", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
-  public ResponseEntity<?> createOffice(@RequestBody OfficeRequest officeRequest) {
+  public ResponseEntity<?> createOffice(@RequestBody OfficeRequest officeRequest) throws IOException {
     var office = officeService.createOffice(officeRequest);
     if (office.isLeft()) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(office.left().get());
     }
-    var result = office.get();
+    var result = office.right().get();
     Link linkOffice = linkTo(OfficeRestController.class).slash(result.getId()).withSelfRel();
     result.add(linkOffice);
     return ResponseEntity.status(HttpStatus.CREATED).body(result);

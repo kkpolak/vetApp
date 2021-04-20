@@ -59,7 +59,7 @@ public class VetRestController {
   public ResponseEntity<?> createVet(@RequestBody VetRequest vetRequest) {
     var vet = vetService.createVet(vetRequest);
     if (vet.isLeft()) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST)
           .body(vet.left().get());
     }
     var result = vet.get();
