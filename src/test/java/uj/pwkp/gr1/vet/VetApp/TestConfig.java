@@ -14,7 +14,7 @@ import uj.pwkp.gr1.vet.VetApp.entity.Status;
 import uj.pwkp.gr1.vet.VetApp.entity.Vet;
 import uj.pwkp.gr1.vet.VetApp.entity.Visit;
 
-public class BaseTestObjects {
+public class TestConfig {
 
   public static Animal animal1;
   public static Animal animal2;

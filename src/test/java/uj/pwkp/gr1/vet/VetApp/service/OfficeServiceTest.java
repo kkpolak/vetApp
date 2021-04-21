@@ -2,11 +2,10 @@ package uj.pwkp.gr1.vet.VetApp.service;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
-import static uj.pwkp.gr1.vet.VetApp.BaseTestObjects.initOffices;
-import static uj.pwkp.gr1.vet.VetApp.BaseTestObjects.office1;
-import static uj.pwkp.gr1.vet.VetApp.BaseTestObjects.office2;
+import static uj.pwkp.gr1.vet.VetApp.TestConfig.initOffices;
+import static uj.pwkp.gr1.vet.VetApp.TestConfig.office1;
+import static uj.pwkp.gr1.vet.VetApp.TestConfig.office2;
 
 import java.util.Collections;
 import java.util.List;
@@ -17,8 +16,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uj.pwkp.gr1.vet.VetApp.controller.rest.request.OfficeRequest;
-import uj.pwkp.gr1.vet.VetApp.entity.Office;
 import uj.pwkp.gr1.vet.VetApp.repository.OfficeRepository;
 
 @ExtendWith(MockitoExtension.class)

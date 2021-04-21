@@ -2,11 +2,10 @@ package uj.pwkp.gr1.vet.VetApp.service;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
-import static uj.pwkp.gr1.vet.VetApp.BaseTestObjects.client1;
-import static uj.pwkp.gr1.vet.VetApp.BaseTestObjects.client2;
-import static uj.pwkp.gr1.vet.VetApp.BaseTestObjects.initClients;
+import static uj.pwkp.gr1.vet.VetApp.TestConfig.client1;
+import static uj.pwkp.gr1.vet.VetApp.TestConfig.client2;
+import static uj.pwkp.gr1.vet.VetApp.TestConfig.initClients;
 
 import java.util.Collections;
 import java.util.List;
@@ -18,8 +17,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uj.pwkp.gr1.vet.VetApp.controller.rest.request.ClientRequest;
-import uj.pwkp.gr1.vet.VetApp.entity.Client;
 import uj.pwkp.gr1.vet.VetApp.repository.ClientRepository;
 
 @ExtendWith(MockitoExtension.class)
