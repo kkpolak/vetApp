@@ -11,12 +11,13 @@ import javax.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.hateoas.RepresentationModel;
 
 @Data
 @AllArgsConstructor
 @Builder
 @Entity(name = "animal")
-public class Animal {
+public class Animal extends RepresentationModel<Animal> {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -28,4 +29,11 @@ public class Animal {
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "owner_id", referencedColumnName = "id")
   private Client owner;
+
+  protected Animal() {
+    id = 0;
+    name = "-";
+    dateOfBirth = LocalDateTime.now();
+    type = null;
+  }
 }

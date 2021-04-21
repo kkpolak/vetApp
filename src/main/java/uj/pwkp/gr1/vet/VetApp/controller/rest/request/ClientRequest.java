@@ -7,5 +7,5 @@ import lombok.Data;
 public class ClientRequest {
   private final String firstName;
   private final String lastName;
-  private final List<Integer> animalIdList;
+//  private final List<Integer> animalIdList;
 }
