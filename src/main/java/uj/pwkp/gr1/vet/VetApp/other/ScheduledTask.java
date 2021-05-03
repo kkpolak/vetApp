@@ -14,7 +14,7 @@ public class ScheduledTask {
   @Autowired
   VisitService visitService;
 
-  @Scheduled(fixedRate = 3600)
+  @Scheduled(fixedRate = 36000)
   public void updateVisitStatusEveryHour() {
     var visitList = visitService.getAllVisits();
     visitList.forEach(v -> {

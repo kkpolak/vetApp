@@ -60,10 +60,6 @@ public class Visit extends RepresentationModel<Visit> {
     duration = Duration.ZERO;
     status = Status.PLANNED;
     price = null;
-    animal = null;
-    client = null;
-    vet = null;
-    office = null;
   }
 
 }
