@@ -4,12 +4,9 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.web.WebProperties.Resources;
 import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,9 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uj.pwkp.gr1.vet.VetApp.controller.rest.request.AnimalRequest;
-import uj.pwkp.gr1.vet.VetApp.controller.rest.request.ClientRequest;
 import uj.pwkp.gr1.vet.VetApp.entity.Animal;
-import uj.pwkp.gr1.vet.VetApp.entity.Client;
 import uj.pwkp.gr1.vet.VetApp.service.AnimalService;
 
 @RestController
@@ -35,17 +30,14 @@ public class AnimalRestController {
 
   //@GetMapping(path = "/{id}", produces = "application/hal+json")
   @GetMapping(path = "/{id}", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
-  public ResponseEntity<Animal> getAnimal(@PathVariable int id) {
-    var animal = animalService.getAnimalById(id);
-    if (animal.isEmpty()) {
-      return ResponseEntity.notFound().build();
-    }
-    var result = animal.get();
+  public ResponseEntity<Animal> getAnimalById(@PathVariable int id) {
+    var result = animalService.getAnimalById(id);
     Link linkAnimal = linkTo(AnimalRestController.class).slash(id).withSelfRel();
-    Link linkOwner = linkTo(ClientRestController.class).slash(result.getOwner().getId()).withSelfRel();
+    Link linkOwner = linkTo(ClientRestController.class).slash(result.getOwner().getId())
+        .withSelfRel();
     result.add(linkAnimal);
     result.getOwner().add(linkOwner);
-    return new ResponseEntity<>(result, HttpStatus.OK);
+    return ResponseEntity.ok(result);
   }
 
   //@GetMapping(path = "/all", produces = "application/hal+json")
@@ -62,14 +54,11 @@ public class AnimalRestController {
 
   //@PostMapping(path = "/create", produces = "application/hal+json")
   @PostMapping(path = "/create", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
-  public ResponseEntity<?> createAnimal(@RequestBody AnimalRequest animalRequest) {
-    var animal = animalService.createAnimal(animalRequest);
-    if (animal.isLeft()) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(animal.left().get());
-    }
-    var result = animal.right().get();
+  public ResponseEntity<Animal> createAnimal(@RequestBody AnimalRequest animalRequest) {
+    var result = animalService.createAnimal(animalRequest);
     Link linkAnimal = linkTo(AnimalRestController.class).slash(result.getId()).withSelfRel();
-    Link linkOwner = linkTo(ClientRestController.class).slash(result.getOwner().getId()).withSelfRel();
+    Link linkOwner = linkTo(ClientRestController.class).slash(result.getOwner().getId())
+        .withSelfRel();
     result.add(linkAnimal);
     result.getOwner().add(linkOwner);
     return ResponseEntity.status(HttpStatus.CREATED).body(result);
@@ -77,16 +66,13 @@ public class AnimalRestController {
 
   //@DeleteMapping(path = "/delete/{id}", produces = "application/hal+json")
   @DeleteMapping(path = "/delete/{id}", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
-  ResponseEntity<?> deleteAnimal(@PathVariable int id) {
-    var animal = animalService.delete(id);
-    if (animal.isEmpty()) {
-      return ResponseEntity.notFound().build();
-    }
-    var result = animal.get();
+  ResponseEntity<Animal> deleteAnimal(@PathVariable int id) {
+    var result = animalService.delete(id);
     Link linkAnimal = linkTo(AnimalRestController.class).slash(id).withSelfRel();
-    Link linkOwner = linkTo(ClientRestController.class).slash(result.getOwner().getId()).withSelfRel();
+    Link linkOwner = linkTo(ClientRestController.class).slash(result.getOwner().getId())
+        .withSelfRel();
     result.add(linkAnimal);
     result.getOwner().add(linkOwner);
-    return new ResponseEntity<>(result, HttpStatus.OK);
+    return ResponseEntity.ok(result);
   }
 }

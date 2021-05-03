@@ -54,7 +54,7 @@ public class OfficeServiceTest {
   public void getOfficeById() {
     given(officeRepository.findById(1)).willReturn(Optional.of(office1));
 
-    var office = officeService.getOffcieById(1);
+    var office = officeService.getOfficeById(1);
 
     assertThat(office).isEqualTo(Optional.of(office1));
   }

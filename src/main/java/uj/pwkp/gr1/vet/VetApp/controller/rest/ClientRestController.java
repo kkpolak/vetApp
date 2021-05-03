@@ -2,7 +2,6 @@ package uj.pwkp.gr1.vet.VetApp.controller.rest;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
@@ -30,11 +29,7 @@ public class ClientRestController {
   //@GetMapping(path = "/{id}", produces = "application/hal+json")
   @GetMapping(path = "/{id}", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
   public ResponseEntity<?> getClient(@PathVariable int id) {
-    var client = clientService.getClientById(id);
-    if (client.isEmpty()) {
-      return ResponseEntity.notFound().build();
-    }
-    var result = client.get();
+    var result = clientService.getClientById(id);
     Link linkClient = linkTo(ClientRestController.class).slash(id).withSelfRel();
     result.add(linkClient);
     return new ResponseEntity<>(result, HttpStatus.OK);
@@ -52,11 +47,7 @@ public class ClientRestController {
   //@PostMapping(path = "/create", produces = "application/hal+json")
   @PostMapping(path = "/create", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
   public ResponseEntity<?> createClient(@RequestBody ClientRequest clientRequest) {
-    var client = clientService.createClient(clientRequest);
-    if (client.isLeft()) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(client.left().get());
-    }
-    var result = client.right().get();
+    var result = clientService.createClient(clientRequest);
     Link linkClient = linkTo(ClientRestController.class).slash(result.getId()).withSelfRel();
     result.add(linkClient);
     return new ResponseEntity<>(result, HttpStatus.OK);
@@ -65,11 +56,7 @@ public class ClientRestController {
   //@DeleteMapping(path = "/delete/{id}", produces = "application/hal+json")
   @DeleteMapping(path = "/delete/{id}", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
   public ResponseEntity<?> deleteClient(@PathVariable int id) {
-    var client = clientService.delete(id);
-    if (client.isEmpty()) {
-      return ResponseEntity.notFound().build();
-    }
-    var result = client.get();
+    var result = clientService.delete(id);
     Link linkClient = linkTo(ClientRestController.class).slash(id).withSelfRel();
     result.add(linkClient);
     return new ResponseEntity<>(result, HttpStatus.OK);

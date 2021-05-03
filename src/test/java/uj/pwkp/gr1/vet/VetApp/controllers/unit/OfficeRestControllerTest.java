@@ -66,7 +66,7 @@ public class OfficeRestControllerTest {
                 .id(1)
                 .name("office")
                 .build();
-        given(officeService.getOffcieById(1)).willReturn(Optional.ofNullable(office));
+        given(officeService.getOfficeById(1)).willReturn(Optional.ofNullable(office));
         String uri = "/api/offices/1";
 
         //when
@@ -81,7 +81,7 @@ public class OfficeRestControllerTest {
     @Test
     public void givenOffices_whenGetOfficeByWrongId_thenReturnJsonWithNotFound() throws Exception {
         //given
-        given(officeService.getOffcieById(1)).willReturn(Optional.empty());
+        given(officeService.getOfficeById(1)).willReturn(Optional.empty());
         String uri = "/api/offices/1";
 
         //when

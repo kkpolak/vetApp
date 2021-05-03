@@ -35,11 +35,7 @@ public class VisitsRestController {
   //@GetMapping(path = "/{id}", produces = "application/hal+json")
   @GetMapping(path = "/{id}", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
   public ResponseEntity<?> getVisit(@PathVariable int id) {
-    var visit = visitsService.getVisitById(id);
-    if (visit.isEmpty()) {
-      return ResponseEntity.notFound().build();
-    }
-    var result = visit.get();
+    var result = visitsService.getVisitById(id);
     Link linkVisit = linkTo(VisitsRestController.class).slash(id).withSelfRel();
     Link linkAnimal = linkTo(AnimalRestController.class).slash(result.getAnimal().getId())
         .withSelfRel();
@@ -67,12 +63,7 @@ public class VisitsRestController {
   //@PostMapping(path = "/create", produces = "application/hal+json")
   @PostMapping(path = "/create", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
   public ResponseEntity<?> createVisit(@RequestBody VisitRequest visitReq) {
-    var visit = visitsService.createVisit(visitReq);
-
-    if (visit.isLeft()) {
-      return visitCreationResultToBadRequest(visit.left().get());
-    }
-    var result = visit.get();
+    var result = visitsService.createVisit(visitReq);
     Link linkVisit = linkTo(VisitsRestController.class).slash(result.getId()).withSelfRel();
     Link linkAnimal = linkTo(AnimalRestController.class).slash(result.getAnimal().getId())
         .withSelfRel();
@@ -90,11 +81,7 @@ public class VisitsRestController {
   //@DeleteMapping(path = "/delete/{id}", produces = "application/hal+json")
   @DeleteMapping(path = "/delete/{id}", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
   public ResponseEntity<?> deleteVisit(@PathVariable int id) {
-    var visit = visitsService.delete(id);
-    if (visit.isEmpty()) {
-      return ResponseEntity.notFound().build();
-    }
-    var result = visit.get();
+    var result = visitsService.delete(id);
     Link linkVisit = linkTo(VisitsRestController.class).slash(id).withSelfRel();
     Link linkAnimal = linkTo(AnimalRestController.class).slash(result.getAnimal().getId())
         .withSelfRel();
@@ -119,14 +106,14 @@ public class VisitsRestController {
       return ResponseEntity.badRequest().body("{\"reason\": \"Unknown status\"}");
     }
     var result = visitsService.updateVisitStatus(id, newStatus);
-    return result.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
   @PatchMapping(path = "update/{vetId}/{visitId}/{status}")
   public ResponseEntity<?> updateStatusByVet(@PathVariable("vetId") int vetId,
       @PathVariable("visitId") int visitId, @PathVariable("status") @Min(1) @Max(2) int status) {
     var result = visitsService.changeVisitStatus(vetId, visitId, status);
-    return result.map(ResponseEntity::ok).orElse(ResponseEntity.badRequest().build());
+    return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
   private ResponseEntity<?> visitToResult(Visit visit) {
