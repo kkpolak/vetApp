@@ -57,7 +57,7 @@ public class ClientServiceTest {
 
     var client = clientService.getClientById(1);
 
-    assertThat(client).isEqualTo(Optional.of(client1));
+    assertThat(client).isEqualTo(client1);
   }
 
   @Test

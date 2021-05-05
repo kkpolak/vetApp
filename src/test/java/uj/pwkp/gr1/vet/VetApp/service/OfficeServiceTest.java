@@ -56,7 +56,7 @@ public class OfficeServiceTest {
 
     var office = officeService.getOfficeById(1);
 
-    assertThat(office).isEqualTo(Optional.of(office1));
+    assertThat(office).isEqualTo(office1);
   }
 
   @Test

@@ -20,6 +20,10 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uj.pwkp.gr1.vet.VetApp.controller.rest.ClientRestController;
 import uj.pwkp.gr1.vet.VetApp.controller.rest.request.ClientRequest;
 import uj.pwkp.gr1.vet.VetApp.entity.Client;
+import uj.pwkp.gr1.vet.VetApp.exception.VetAppResourceType;
+import uj.pwkp.gr1.vet.VetApp.exception.exceptions.CreateVetAppException;
+import uj.pwkp.gr1.vet.VetApp.exception.exceptions.DeleteVetAppException;
+import uj.pwkp.gr1.vet.VetApp.exception.exceptions.ObjectNotFoundVetAppException;
 import uj.pwkp.gr1.vet.VetApp.service.ClientService;
 import java.util.Collections;
 import java.util.List;
@@ -67,7 +71,7 @@ public class ClientRestControllerTest {
                 .firstName("John")
                 .lastName("Doe")
                 .build();
-        given(clientService.getClientById(1)).willReturn(java.util.Optional.ofNullable(client));
+        given(clientService.getClientById(1)).willReturn(client);
         String uri = "/api/clients/1";
 
         mvc.perform(get(uri)
@@ -78,7 +82,7 @@ public class ClientRestControllerTest {
 
     @Test
     public void givenClients_whenGetClientByWrongId_thenReturnNotFoundJson() throws Exception {
-        given(clientService.getClientById(1)).willReturn(java.util.Optional.empty());
+        given(clientService.getClientById(1)).willThrow(new ObjectNotFoundVetAppException("", VetAppResourceType.CLIENT));
         String uri = "/api/clients/1";
 
         mvc.perform(get(uri)
@@ -95,33 +99,7 @@ public class ClientRestControllerTest {
                 .firstName("John")
                 .lastName("Doe")
                 .build();
-        Either<String, Client> res = new Either<String, Client>() {
-            @Override
-            public String getLeft() {
-                return null;
-            }
-
-            @Override
-            public boolean isLeft() {
-                return false;
-            }
-
-            @Override
-            public boolean isRight() {
-                return true;
-            }
-
-            @Override
-            public Client get() {
-                return client;
-            }
-
-            @Override
-            public String stringPrefix() {
-                return null;
-            }
-        };
-        given(clientService.createClient(clientRequest)).willReturn(res);
+        given(clientService.createClient(clientRequest)).willReturn(client);
         String uri = "/api/clients/create";
         ObjectMapper mapper = new ObjectMapper();
         RequestBuilder requestBuilder = MockMvcRequestBuilders
@@ -142,33 +120,7 @@ public class ClientRestControllerTest {
     public void givenClientRequest_whenCreateClient_thenReturnJsonWithBadRequest() throws Exception {
         //given
         ClientRequest clientRequest = new ClientRequest("John", "Doe");
-        Either<String, Client> res = new Either<String, Client>() {
-            @Override
-            public String getLeft() {
-                return "Client creation error";
-            }
-
-            @Override
-            public boolean isLeft() {
-                return true;
-            }
-
-            @Override
-            public boolean isRight() {
-                return false;
-            }
-
-            @Override
-            public Client get() {
-                return null;
-            }
-
-            @Override
-            public String stringPrefix() {
-                return null;
-            }
-        };
-        given(clientService.createClient(clientRequest)).willReturn(res);
+        given(clientService.createClient(clientRequest)).willThrow(new CreateVetAppException("", VetAppResourceType.CLIENT));
         String uri = "/api/clients/create";
         ObjectMapper mapper = new ObjectMapper();
         RequestBuilder requestBuilder = MockMvcRequestBuilders
@@ -181,8 +133,8 @@ public class ClientRestControllerTest {
 
         //then
         MockHttpServletResponse response = result.getResponse();
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
-        Assertions.assertTrue(response.getContentAsString().equals("Client creation error"));
+        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), response.getStatus());
+//        Assertions.assertTrue(response.getContentAsString().equals("Client creation error"));
     }
 
     @Test
@@ -193,7 +145,7 @@ public class ClientRestControllerTest {
                 .firstName("John")
                 .lastName("Doe")
                 .build();
-        given(clientService.delete(1)).willReturn(Optional.ofNullable(client));
+        given(clientService.delete(1)).willReturn(client);
         String uri = "/api/clients/delete/1";
 
         //when
@@ -209,7 +161,7 @@ public class ClientRestControllerTest {
     @Test
     public void givenClientId_whenDeleteClient_thenReturnJsonWithNotFound() throws Exception {
         //given
-        given(clientService.delete(1)).willReturn(Optional.empty());
+        given(clientService.delete(1)).willThrow(new DeleteVetAppException("", VetAppResourceType.CLIENT));
         String uri = "/api/clients/delete/1";
 
         //when
@@ -217,6 +169,6 @@ public class ClientRestControllerTest {
                 .contentType(MediaType.APPLICATION_JSON));
 
         //then
-        result.andExpect(status().isNotFound());
+        result.andExpect(status().isInternalServerError());
     }
 }

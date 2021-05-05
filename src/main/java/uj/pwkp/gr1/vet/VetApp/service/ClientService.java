@@ -36,9 +36,13 @@ public class ClientService {
 
   public Client getClientById(int id) {
     var result = clientRepository.findById(id);
-    return result.orElseThrow(
-        () -> new ObjectNotFoundVetAppException(String.format("Wrong id: %s", id),
-            VetAppResourceType.CLIENT));
+    log.info("Getting client by id: " + id);
+    return result.orElseThrow(() -> {
+          String message = String.format("Wrong client  id: %s ", id);
+          log.error(message);
+          throw new ObjectNotFoundVetAppException(message,
+                  VetAppResourceType.CLIENT);
+        });
   }
 
   public Client createClient(ClientRequest req) {
@@ -51,12 +55,11 @@ public class ClientService {
           //.animals(animalList)
           .build());
     } catch (Exception e) {
-      throw new CreateVetAppException(
-          String
-              .format("An attempt to add a client: %s to the database has failed", req.toString()),
-          VetAppResourceType.CLIENT);
+      String message = String.format("An attempt to add a client: %s to the database has failed", req.toString());
+      log.error(message);
+      throw new CreateVetAppException(message, VetAppResourceType.CLIENT);
     }
-
+    log.info(String.format("Client %s created", req.toString()));
     return c;
   }
 
@@ -66,9 +69,9 @@ public class ClientService {
       clientRepository.delete(client);
       return client;
     } catch (Exception e) {
-      throw new DeleteVetAppException(
-          String.format("An attempt to add a client: %s to the database has failed", client),
-          VetAppResourceType.CLIENT);
+      String message = String.format("An attempt to add a client: %s to the database has failed", client);
+      log.error(message);
+      throw new DeleteVetAppException(message, VetAppResourceType.CLIENT);
     }
   }
 }

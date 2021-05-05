@@ -35,9 +35,12 @@ public class AnimalService {
   public Animal getAnimalById(int id) {
     var result = animalRepository.findById(id);
     log.info("Getting animal by id: " + id);
-    return result.orElseThrow(
-        () -> new ObjectNotFoundVetAppException(String.format("Wrong id: %s", id),
-            VetAppResourceType.ANIMAL));
+    return result.orElseThrow(() -> {
+          String message = String.format("Wrong id: %s", id);
+          log.error(message);
+          throw new ObjectNotFoundVetAppException(message,
+            VetAppResourceType.ANIMAL);
+        });
   }
 
   public Animal createAnimal(AnimalRequest req) {
@@ -53,12 +56,11 @@ public class AnimalService {
               .name(req.getName())
               .build());
     } catch (Exception e) {
-      throw new CreateVetAppException(
-          String
-              .format("An attempt to add a animal: %s to the database has failed", req.toString()),
-          VetAppResourceType.ANIMAL);
+      String message = String.format("An attempt to add a animal: %s to the database has failed", req.toString());
+      log.error(message);
+      throw new CreateVetAppException(message, VetAppResourceType.ANIMAL);
     }
-
+    log.info(String.format("Animal %s created", req.toString()));
     return a;
   }
 
@@ -66,11 +68,12 @@ public class AnimalService {
     var animal = getAnimalById(id);
     try {
       animalRepository.delete(animal);
+      log.info(String.format("Animal %s deleted", animal.toString()));
       return animal;
     } catch (Exception e) {
-      throw new DeleteVetAppException(
-          String.format("An attempt to add a animal: %s to the database has failed", animal),
-          VetAppResourceType.ANIMAL);
+      String message = String.format("An attempt to delete a animal: %s from the database has failed", id);
+      log.error(message);
+      throw new DeleteVetAppException(message, VetAppResourceType.ANIMAL);
     }
   }
 }

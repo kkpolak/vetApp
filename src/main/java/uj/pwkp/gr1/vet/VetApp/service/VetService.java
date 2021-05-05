@@ -37,9 +37,11 @@ public class VetService {
   public Vet getVetById(int id) {
     var result = vetRepository.findById(id);
     log.info("Getting vet by id: " + id);
-    return result.orElseThrow(
-        () -> new ObjectNotFoundVetAppException(String.format("Wrong id: %s", id),
-            VetAppResourceType.VET));
+    return result.orElseThrow(() -> {
+          String message = String.format("Wrong vet id: %s", id);
+          log.error(message);
+          throw new ObjectNotFoundVetAppException(message, VetAppResourceType.VET);
+        });
   }
 
   public Vet createVet(VetRequest req) {
@@ -56,12 +58,11 @@ public class VetService {
               .photo(req.getPhoto())
               .build());
     } catch (Exception e) {
-      throw new CreateVetAppException(
-          String
-              .format("An attempt to add a vet: %s to the database has failed", req.toString()),
-          VetAppResourceType.VET);
+      String message = String.format("An attempt to add a vet: %s to the database has failed", req.toString());
+      log.error(message);
+      throw new CreateVetAppException(message, VetAppResourceType.VET);
     }
-
+    log.info(String.format("Vet %s created", req.toString()));
     return v;
   }
 
@@ -69,34 +70,41 @@ public class VetService {
     var vet = getVetById(id);
     try {
       vetRepository.delete(vet);
+      log.info(String.format("Vet %s deleted", vet.toString()));
       return vet;
     } catch (Exception e) {
-      throw new DeleteVetAppException(
-          String.format("An attempt to add a vet: %s to the database has failed", vet),
-          VetAppResourceType.VET);
+      String message = String.format("An attempt to delete a vet: %s to the database has failed", vet);
+      log.error(message);
+      throw new DeleteVetAppException(message, VetAppResourceType.VET);
     }
   }
 
   public Visit changeVisitDescription(@NotNull int vetId, @NotNull int visitId,
       @NotNull String description) {
-    var visit = visitRepository.findById(visitId).orElseThrow(
-        () -> new ObjectNotFoundVetAppException(String.format("Wrong id: %s", visitId),
-            VetAppResourceType.VISIT));
+    var visit = visitRepository
+            .findById(visitId)
+            .orElseThrow(() -> {
+          String message = String.format("Wrong id: %s", visitId);
+          log.error(message);
+          throw new ObjectNotFoundVetAppException(message, VetAppResourceType.VISIT);
+        });
     var vet = getVetById(vetId);
 
     if (visit.getVet().getId() != vet.getId()) {
-      throw new VisitSystemException("this vet is not responsible for this visit", Status.NONE,
-          VisitCreationResult.COMPATIBILITY_PROBLEM);
+      String message = "this vet is not responsible for this visit";
+      log.error(message);
+      throw new VisitSystemException(message, Status.NONE, VisitCreationResult.COMPATIBILITY_PROBLEM);
     }
 
     if (visit.getStatus() != Status.PLANNED
         || visit.getStatus() != Status.FINISHED_SUCCESS) {
-      throw new VisitSystemException(
-          "you cannot change the description of a visit with this status",
-          visit.getStatus(), VisitCreationResult.COMPATIBILITY_PROBLEM);
+      String message = "you cannot change the description of a visit with this status";
+      log.error(message);
+      throw new VisitSystemException(message, visit.getStatus(), VisitCreationResult.COMPATIBILITY_PROBLEM);
     }
 
     visitRepository.updateDescription(visitId, description);
+    log.info(String.format("Updated status of visit: %s by vet: %s  to description: %s - service", visitId, vetId, description));
     return visit;
   }
 

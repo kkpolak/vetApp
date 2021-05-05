@@ -27,10 +27,13 @@ public class OfficeService {
   }
 
   public Office getOfficeById(int id) {
+    log.info("Getting office by id: " + id);
     var result = officeRepository.findById(id);
-    return result.orElseThrow(
-        () -> new ObjectNotFoundVetAppException(String.format("Wrong id: %s", id),
-            VetAppResourceType.OFFICE));
+    return result.orElseThrow(() -> {
+          String message = String.format("Wrong id: %s", id);
+          log.error(message);
+          throw new ObjectNotFoundVetAppException(message, VetAppResourceType.OFFICE);
+        });
   }
 
   public Office createOffice(OfficeRequest officeRequest) {
@@ -40,10 +43,11 @@ public class OfficeService {
           .name(officeRequest.getName())
           .build());
     } catch (Exception e) {
-      throw new CreateVetAppException(
-          String.format("An attempt to add a office: %s to the database has failed",
-              officeRequest.toString()), VetAppResourceType.ANIMAL);
+      String message = String.format("An attempt to add a office: %s to the database has failed", officeRequest.toString());
+      log.error(message);
+      throw new CreateVetAppException(message, VetAppResourceType.ANIMAL);
     }
+    log.info(String.format("Office %s created", officeRequest.toString()));
     return office;
   }
 
@@ -51,11 +55,12 @@ public class OfficeService {
     var office = getOfficeById(id);
     try {
       officeRepository.delete(office);
+      log.info(String.format("Office %s deleted", office));
       return office;
     } catch (Exception e) {
-      throw new DeleteVetAppException(
-          String.format("An attempt to add a office: %s to the database has failed", office),
-          VetAppResourceType.ANIMAL);
+      String message = String.format("An attempt to add a office: %s to the database has failed", office);
+      log.error(message);
+      throw new DeleteVetAppException(message, VetAppResourceType.ANIMAL);
     }
   }
 }
