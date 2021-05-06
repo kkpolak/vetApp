@@ -74,7 +74,7 @@ public class VisitServiceTest {
 
     var visit = visitService.getVisitById(1);
 
-    assertThat(visit).isEqualTo(Optional.of(visit1));
+    assertThat(visit).isEqualTo(visit1);
   }
 
   @Test

@@ -8,11 +8,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uj.pwkp.gr1.vet.VetApp.controller.rest.request.AnimalRequest;
-import uj.pwkp.gr1.vet.VetApp.controller.rest.request.VetRequest;
 import uj.pwkp.gr1.vet.VetApp.entity.Animal;
 import uj.pwkp.gr1.vet.VetApp.entity.Client;
-import uj.pwkp.gr1.vet.VetApp.entity.Vet;
-import uj.pwkp.gr1.vet.VetApp.entity.Visit;
+import uj.pwkp.gr1.vet.VetApp.exception.VetAppResourceType;
+import uj.pwkp.gr1.vet.VetApp.exception.exceptions.CreateVetAppException;
+import uj.pwkp.gr1.vet.VetApp.exception.exceptions.DeleteVetAppException;
+import uj.pwkp.gr1.vet.VetApp.exception.exceptions.ObjectNotFoundVetAppException;
 import uj.pwkp.gr1.vet.VetApp.repository.AnimalRepository;
 import uj.pwkp.gr1.vet.VetApp.repository.ClientRepository;
 
@@ -24,26 +25,28 @@ public class AnimalService {
   private AnimalRepository animalRepository;
 
   @Autowired
-  private ClientRepository clientRepository;
+  private ClientService clientService;
 
   public List<Animal> getAllAnimals() {
+    log.info("Getting all animals - service");
     return animalRepository.findAll();
   }
 
-  public Optional<Animal> getAnimalById(int id) {
-    return animalRepository.findById(id);
+  public Animal getAnimalById(int id) {
+    var result = animalRepository.findById(id);
+    log.info("Getting animal by id: " + id);
+    return result.orElseThrow(() -> {
+          String message = String.format("Wrong id: %s", id);
+          log.error(message);
+          throw new ObjectNotFoundVetAppException(message,
+            VetAppResourceType.ANIMAL);
+        });
   }
 
-  public Either<String, Animal> createAnimal(AnimalRequest req) {
+  public Animal createAnimal(AnimalRequest req) {
     Animal a;
     try {
-      Client client = clientRepository.findById(req.getOwnerId()).orElseGet(
-          () -> {
-            log.info(String.format("client with this id: %x was not found", req.getOwnerId()));
-            return Client.builder().firstName("anonymous").lastName("anonymous")
-                .id(req.getOwnerId())
-                .build();
-          });
+      Client client = clientService.getClientById(req.getOwnerId());
 
       a = animalRepository.save(
           Animal.builder()
@@ -53,21 +56,24 @@ public class AnimalService {
               .name(req.getName())
               .build());
     } catch (Exception e) {
-      return Either.left("animal creation error");
+      String message = String.format("An attempt to add a animal: %s to the database has failed", req.toString());
+      log.error(message);
+      throw new CreateVetAppException(message, VetAppResourceType.ANIMAL);
     }
-
-    return Either.right(a);
+    log.info(String.format("Animal %s created", req.toString()));
+    return a;
   }
 
-  public Optional<Animal> delete(@NotNull int id) {
-    var animal = animalRepository.findById(id);
-    return Optional.ofNullable(animal).map(a -> {
-      animalRepository.deleteById(a.get().getId());
-      return a;
-    }).orElseGet(() -> {
-      log.info(String.format("Animal with such id: %x was not found", id));
-      return Optional.empty();
-    });
+  public Animal delete(@NotNull int id) {
+    var animal = getAnimalById(id);
+    try {
+      animalRepository.delete(animal);
+      log.info(String.format("Animal %s deleted", animal.toString()));
+      return animal;
+    } catch (Exception e) {
+      String message = String.format("An attempt to delete a animal: %s from the database has failed", id);
+      log.error(message);
+      throw new DeleteVetAppException(message, VetAppResourceType.ANIMAL);
+    }
   }
-
 }

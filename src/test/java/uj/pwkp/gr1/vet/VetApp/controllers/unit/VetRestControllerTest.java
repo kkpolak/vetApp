@@ -22,6 +22,10 @@ import uj.pwkp.gr1.vet.VetApp.controller.rest.request.ClientRequest;
 import uj.pwkp.gr1.vet.VetApp.controller.rest.request.VetRequest;
 import uj.pwkp.gr1.vet.VetApp.entity.Client;
 import uj.pwkp.gr1.vet.VetApp.entity.Vet;
+import uj.pwkp.gr1.vet.VetApp.exception.VetAppResourceType;
+import uj.pwkp.gr1.vet.VetApp.exception.exceptions.CreateVetAppException;
+import uj.pwkp.gr1.vet.VetApp.exception.exceptions.DeleteVetAppException;
+import uj.pwkp.gr1.vet.VetApp.exception.exceptions.ObjectNotFoundVetAppException;
 import uj.pwkp.gr1.vet.VetApp.service.VetService;
 
 import java.util.Collections;
@@ -79,7 +83,7 @@ public class VetRestControllerTest {
                 .admissionEnd(null)
                 .duration(null)
                 .build();
-        given(vetService.getVetById(1)).willReturn(java.util.Optional.ofNullable(vet));
+        given(vetService.getVetById(1)).willReturn(vet);
         String uri = "/api/vet/1";
 
         mvc.perform(get(uri)
@@ -90,7 +94,7 @@ public class VetRestControllerTest {
 
     @Test
     public void givenVetsId_whenGetVetByWrongId_thenReturnJsonWithNotFound() throws Exception {
-        given(vetService.getVetById(1)).willReturn(java.util.Optional.empty());
+        given(vetService.getVetById(1)).willThrow(new ObjectNotFoundVetAppException("", VetAppResourceType.VET));
         String uri = "/api/vet/1";
 
         mvc.perform(get(uri)
@@ -112,33 +116,7 @@ public class VetRestControllerTest {
                 .admissionEnd(null)
                 .duration(null)
                 .build();
-        Either<String, Vet> res = new Either<String, Vet>() {
-            @Override
-            public String getLeft() {
-                return null;
-            }
-
-            @Override
-            public boolean isLeft() {
-                return false;
-            }
-
-            @Override
-            public boolean isRight() {
-                return true;
-            }
-
-            @Override
-            public Vet get() {
-                return vet;
-            }
-
-            @Override
-            public String stringPrefix() {
-                return null;
-            }
-        };
-        given(vetService.createVet(vetRequest)).willReturn(res);
+        given(vetService.createVet(vetRequest)).willReturn(vet);
         String uri = "/api/vet/create";
         ObjectMapper mapper = new ObjectMapper();
         RequestBuilder requestBuilder = MockMvcRequestBuilders
@@ -160,33 +138,7 @@ public class VetRestControllerTest {
         //given
         VetRequest vetRequest = new VetRequest("vet", "vet", "vet",
                 null, null, null);
-        Either<String, Vet> res = new Either<String, Vet>() {
-            @Override
-            public String getLeft() {
-                return "vet creation error";
-            }
-
-            @Override
-            public boolean isLeft() {
-                return true;
-            }
-
-            @Override
-            public boolean isRight() {
-                return false;
-            }
-
-            @Override
-            public Vet get() {
-                return null;
-            }
-
-            @Override
-            public String stringPrefix() {
-                return null;
-            }
-        };
-        given(vetService.createVet(vetRequest)).willReturn(res);
+        given(vetService.createVet(vetRequest)).willThrow(new CreateVetAppException("", VetAppResourceType.VET));
         String uri = "/api/vet/create";
         ObjectMapper mapper = new ObjectMapper();
         RequestBuilder requestBuilder = MockMvcRequestBuilders
@@ -199,7 +151,7 @@ public class VetRestControllerTest {
 
         //then
         MockHttpServletResponse response = result.getResponse();
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
+        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), response.getStatus());
         Assertions.assertTrue(response.getContentAsString().contains(vetRequest.getFirstName()));
     }
 
@@ -215,7 +167,7 @@ public class VetRestControllerTest {
                 .admissionEnd(null)
                 .duration(null)
                 .build();
-        given(vetService.delete(1)).willReturn(Optional.ofNullable(vet));
+        given(vetService.delete(1)).willReturn(vet);
         String uri = "/api/vet/delete/1";
 
         //when
@@ -231,7 +183,7 @@ public class VetRestControllerTest {
     @Test
     public void givenWrongVetId_whenDeleteVet_thenReturnJsonWithNotFound() throws Exception {
         //given
-        given(vetService.delete(1)).willReturn(Optional.empty());
+        given(vetService.delete(1)).willThrow(new DeleteVetAppException("", VetAppResourceType.VET));
         String uri = "/api/vet/delete/1";
 
         //when
@@ -239,6 +191,6 @@ public class VetRestControllerTest {
                 .contentType(MediaType.APPLICATION_JSON));
 
         //then
-        result.andExpect(status().isNotFound());
+        result.andExpect(status().isInternalServerError());
     }
 }

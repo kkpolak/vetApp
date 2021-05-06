@@ -21,6 +21,10 @@ import uj.pwkp.gr1.vet.VetApp.controller.rest.VisitsRestController;
 import uj.pwkp.gr1.vet.VetApp.controller.rest.request.ClientRequest;
 import uj.pwkp.gr1.vet.VetApp.controller.rest.request.VisitRequest;
 import uj.pwkp.gr1.vet.VetApp.entity.*;
+import uj.pwkp.gr1.vet.VetApp.exception.VetAppResourceType;
+import uj.pwkp.gr1.vet.VetApp.exception.exceptions.CreateVetAppException;
+import uj.pwkp.gr1.vet.VetApp.exception.exceptions.DeleteVetAppException;
+import uj.pwkp.gr1.vet.VetApp.exception.exceptions.ObjectNotFoundVetAppException;
 import uj.pwkp.gr1.vet.VetApp.service.VisitCreationResult;
 import uj.pwkp.gr1.vet.VetApp.service.VisitService;
 
@@ -85,7 +89,7 @@ public class VisitRestControllerTest {
                 .vet(new Vet(1, null, null, null, null, null, null))
                 .office(new Office(1, null))
                 .build();
-        given(visitService.getVisitById(1)).willReturn(java.util.Optional.ofNullable(visit));
+        given(visitService.getVisitById(1)).willReturn(visit);
         String uri = "/api/visits/1";
 
         mvc.perform(get(uri)
@@ -96,7 +100,7 @@ public class VisitRestControllerTest {
 
     @Test
     public void givenVisitWrongId_whenGetVisitById_thenReturnJsonWithNotFound() throws Exception {
-        given(visitService.getVisitById(1)).willReturn(java.util.Optional.empty());
+        given(visitService.getVisitById(1)).willThrow(new ObjectNotFoundVetAppException("", VetAppResourceType.VISIT));
         String uri = "/api/visits/1";
 
         mvc.perform(get(uri)
@@ -121,33 +125,7 @@ public class VisitRestControllerTest {
                 .vet(new Vet(1, null, null, null, null, null, null))
                 .office(new Office(1, null))
                 .build();
-        Either<VisitCreationResult, Visit> res = new Either<>() {
-            @Override
-            public VisitCreationResult getLeft() {
-                return null;
-            }
-
-            @Override
-            public boolean isLeft() {
-                return false;
-            }
-
-            @Override
-            public boolean isRight() {
-                return true;
-            }
-
-            @Override
-            public Visit get() {
-                return visit;
-            }
-
-            @Override
-            public String stringPrefix() {
-                return null;
-            }
-        };
-        given(visitService.createVisit(visitRequest)).willReturn(res);
+        given(visitService.createVisit(visitRequest)).willReturn(visit);
         String uri = "/api/visits/create";
         ObjectMapper mapper = new ObjectMapper();
         RequestBuilder requestBuilder = MockMvcRequestBuilders
@@ -169,33 +147,7 @@ public class VisitRestControllerTest {
         //given
         VisitRequest visitRequest = new VisitRequest(LocalDateTime.now(), Duration.ZERO, AnimalType.CAT, BigDecimal.ZERO,
                 1, "special visits", 1, 1, 1);
-        Either<VisitCreationResult, Visit> res = new Either<>() {
-            @Override
-            public VisitCreationResult getLeft() {
-                return VisitCreationResult.REPOSITORY_PROBLEM;
-            }
-
-            @Override
-            public boolean isLeft() {
-                return true;
-            }
-
-            @Override
-            public boolean isRight() {
-                return false;
-            }
-
-            @Override
-            public Visit get() {
-                return null;
-            }
-
-            @Override
-            public String stringPrefix() {
-                return null;
-            }
-        };
-        given(visitService.createVisit(visitRequest)).willReturn(res);
+        given(visitService.createVisit(visitRequest)).willThrow(new CreateVetAppException("", VetAppResourceType.VISIT));
         String uri = "/api/visits/create";
         ObjectMapper mapper = new ObjectMapper();
         RequestBuilder requestBuilder = MockMvcRequestBuilders
@@ -224,7 +176,7 @@ public class VisitRestControllerTest {
                 .vet(new Vet(1, null, null, null, null, null, null))
                 .office(new Office(1, null))
                 .build();
-        given(visitService.delete(1)).willReturn(java.util.Optional.ofNullable(visit));
+        given(visitService.delete(1)).willReturn(visit);
         String uri = "/api/visits/delete/1";
 
         mvc.perform(delete(uri)
@@ -235,11 +187,11 @@ public class VisitRestControllerTest {
 
     @Test
     public void givenWrongVisitId_whenDeleteVisitById_thenReturnJsonWithNotFound() throws Exception {
-        given(visitService.delete(1)).willReturn(java.util.Optional.empty());
+        given(visitService.delete(1)).willThrow(new DeleteVetAppException("", VetAppResourceType.VISIT));
         String uri = "/api/visits/delete/1";
 
         mvc.perform(delete(uri)
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isInternalServerError());
     }
 }

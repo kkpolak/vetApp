@@ -19,6 +19,10 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uj.pwkp.gr1.vet.VetApp.controller.rest.OfficeRestController;
 import uj.pwkp.gr1.vet.VetApp.controller.rest.request.OfficeRequest;
 import uj.pwkp.gr1.vet.VetApp.entity.Office;
+import uj.pwkp.gr1.vet.VetApp.exception.VetAppResourceType;
+import uj.pwkp.gr1.vet.VetApp.exception.exceptions.CreateVetAppException;
+import uj.pwkp.gr1.vet.VetApp.exception.exceptions.DeleteVetAppException;
+import uj.pwkp.gr1.vet.VetApp.exception.exceptions.ObjectNotFoundVetAppException;
 import uj.pwkp.gr1.vet.VetApp.service.OfficeService;
 
 import java.util.Collections;
@@ -66,7 +70,7 @@ public class OfficeRestControllerTest {
                 .id(1)
                 .name("office")
                 .build();
-        given(officeService.getOffcieById(1)).willReturn(Optional.ofNullable(office));
+        given(officeService.getOfficeById(1)).willReturn(office);
         String uri = "/api/offices/1";
 
         //when
@@ -81,7 +85,7 @@ public class OfficeRestControllerTest {
     @Test
     public void givenOffices_whenGetOfficeByWrongId_thenReturnJsonWithNotFound() throws Exception {
         //given
-        given(officeService.getOffcieById(1)).willReturn(Optional.empty());
+        given(officeService.getOfficeById(1)).willThrow(new ObjectNotFoundVetAppException("", VetAppResourceType.OFFICE));
         String uri = "/api/offices/1";
 
         //when
@@ -101,33 +105,7 @@ public class OfficeRestControllerTest {
                 .id(1)
                 .name("office")
                 .build();
-        Either<String, Office> res = new Either<String, Office>() {
-            @Override
-            public String getLeft() {
-                return null;
-            }
-
-            @Override
-            public boolean isLeft() {
-                return false;
-            }
-
-            @Override
-            public boolean isRight() {
-                return true;
-            }
-
-            @Override
-            public Office get() {
-                return office;
-            }
-
-            @Override
-            public String stringPrefix() {
-                return null;
-            }
-        };
-        given(officeService.createOffice(officeRequest)).willReturn(res);
+        given(officeService.createOffice(officeRequest)).willReturn(office);
         String uri = "/api/offices/create";
         ObjectMapper mapper = new ObjectMapper();
         RequestBuilder requestBuilder = MockMvcRequestBuilders
@@ -148,33 +126,7 @@ public class OfficeRestControllerTest {
     public void givenOfficeRequest_whenCreateOffice_thenReturnJsonWithBadRequest() throws Exception {
         //given
         OfficeRequest officeRequest = new OfficeRequest("office");
-        Either<String, Office> res = new Either<String, Office>() {
-            @Override
-            public String getLeft() {
-                return "Office creation error";
-            }
-
-            @Override
-            public boolean isLeft() {
-                return true;
-            }
-
-            @Override
-            public boolean isRight() {
-                return false;
-            }
-
-            @Override
-            public Office get() {
-                return null;
-            }
-
-            @Override
-            public String stringPrefix() {
-                return null;
-            }
-        };
-        given(officeService.createOffice(officeRequest)).willReturn(res);
+        given(officeService.createOffice(officeRequest)).willThrow(new CreateVetAppException("", VetAppResourceType.OFFICE));
         String uri = "/api/offices/create";
         ObjectMapper mapper = new ObjectMapper();
         RequestBuilder requestBuilder = MockMvcRequestBuilders
@@ -187,8 +139,8 @@ public class OfficeRestControllerTest {
 
         //then
         MockHttpServletResponse response = result.getResponse();
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
-        Assertions.assertTrue(response.getContentAsString().equals("Office creation error"));
+        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), response.getStatus());
+//        Assertions.assertTrue(response.getContentAsString().equals("Office creation error"));
     }
 
     @Test
@@ -198,7 +150,7 @@ public class OfficeRestControllerTest {
                 .id(1)
                 .name("office")
                 .build();
-        given(officeService.deleteOffice(1)).willReturn(Optional.ofNullable(office));
+        given(officeService.deleteOffice(1)).willReturn(office);
         String uri = "/api/offices/delete/1";
 
         //when
@@ -213,7 +165,7 @@ public class OfficeRestControllerTest {
     @Test
     public void givenOfficeId_whenDeleteOffice_thenReturnJsonWithNotFound() throws Exception {
         //given
-        given(officeService.deleteOffice(1)).willReturn(Optional.empty());
+        given(officeService.deleteOffice(1)).willThrow(new DeleteVetAppException("", VetAppResourceType.OFFICE));
         String uri = "/api/offices/delete/1";
 
         //when
@@ -221,6 +173,6 @@ public class OfficeRestControllerTest {
                 .contentType(MediaType.APPLICATION_JSON));
 
         //then
-        result.andExpect(status().isNotFound());
+        result.andExpect(status().isInternalServerError());
     }
 }

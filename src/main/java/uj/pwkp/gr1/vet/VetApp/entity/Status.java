@@ -6,4 +6,5 @@ public enum Status {
   FINISHED_NOT_APPEARED,
   FINISHED_AUTOMATICALLY,
   CANCELED,
+  NONE
 }

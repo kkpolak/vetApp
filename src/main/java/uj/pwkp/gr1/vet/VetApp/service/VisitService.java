@@ -19,6 +19,10 @@ import org.springframework.stereotype.Service;
 import uj.pwkp.gr1.vet.VetApp.controller.rest.request.SearchRequest;
 import uj.pwkp.gr1.vet.VetApp.controller.rest.request.VisitRequest;
 import uj.pwkp.gr1.vet.VetApp.entity.*;
+import uj.pwkp.gr1.vet.VetApp.exception.VetAppResourceType;
+import uj.pwkp.gr1.vet.VetApp.exception.exceptions.DeleteVetAppException;
+import uj.pwkp.gr1.vet.VetApp.exception.exceptions.ObjectNotFoundVetAppException;
+import uj.pwkp.gr1.vet.VetApp.exception.exceptions.VisitSystemException;
 import uj.pwkp.gr1.vet.VetApp.repository.*;
 
 @Slf4j
@@ -41,35 +45,56 @@ public class VisitService {
   private OfficeRepository officeRepository;
 
   public List<Visit> getAllVisits() {
+    log.info("Getting all visits - service");
     return visitRepository.findAll();
   }
 
-  public Either<VisitCreationResult, Visit> createVisit(VisitRequest req) {
+  public Visit getVisitById(@NotNull int id) {
+    log.info("Getting visit by id: " + id);
+    var result = visitRepository.findById(id);
+    return result.orElseThrow(() -> {
+          String message = String.format("Wrong id: %s", id);
+          log.error(message);
+          throw new ObjectNotFoundVetAppException(message, VetAppResourceType.VISIT);
+        });
+  }
+
+  public Visit createVisit(VisitRequest req) {
     if (!dateAvailable(req.getStartTime(), req.getDuration(), req)) {
-      return Either.left(VisitCreationResult.OVERLAP);//OpResult.fail(VisitCreationResult.OVERLAP);
+      String message = "the date is not available";
+      log.error(message);
+      throw new VisitSystemException(message, Status.NONE, VisitCreationResult.OVERLAP);
     }
     Visit v;
     try {
-      Vet vet = vetRepository.findById(req.getVetId()).orElseGet(() -> {
-        log.info(String.format("vet with this id: %x was not found", req.getVetId()));
-        return Vet.builder().firstName("anonymous").lastName("anonymous")
-            .id(req.getVetId())
-            .build();
-      });
-      Animal animal = animalRepository.findById(req.getAnimalId()).orElseGet(() -> {
-        log.info(String.format("animal with this id: %x was not found", req.getAnimalId()));
-        return Animal.builder().name("anonymous").id(req.getAnimalId()).build();
-      });
-      Client client = clientRepository.findById(req.getClientId()).orElseGet(() -> {
-        log.info(String.format("client with this id: %x was not found", req.getClientId()));
-        return Client.builder().firstName("anonymous").lastName("anonymous").id(req.getClientId())
-            .build();
-      });
-      Office office = officeRepository.findById(req.getOfficeId()).orElseGet(() -> {
-        log.info(String.format("office with this id: %x was not found", req.getOfficeId()));
-        return Office.builder().name("anonymus").id(req.getOfficeId())
-                .build();
-      });
+      Vet vet = vetRepository
+              .findById(req.getVetId())
+              .orElseThrow(() -> {
+                String message = String.format("Wrong vet id: %s", req.getVetId());
+                log.error(message);
+                throw new ObjectNotFoundVetAppException(message, VetAppResourceType.VET);
+              });
+      Animal animal = animalRepository
+              .findById(req.getAnimalId())
+              .orElseThrow(() -> {
+                String message = String.format("Wrong animal id: %s", req.getAnimalId());
+                log.error(message);
+                throw new ObjectNotFoundVetAppException(message, VetAppResourceType.ANIMAL);
+              });
+      Client client = clientRepository
+              .findById(req.getClientId())
+              .orElseThrow(() -> {
+                String message = String.format("Wrong client id: %s", req.getClientId());
+                log.error(message);
+                throw new ObjectNotFoundVetAppException(message, VetAppResourceType.CLIENT);
+              });
+      Office office = officeRepository
+              .findById(req.getOfficeId())
+              .orElseThrow(() -> {
+                String message = String.format("Wrong office id: %s", req.getOfficeId());
+                log.error(message);
+                throw new ObjectNotFoundVetAppException(message, VetAppResourceType.OFFICE);
+              });
       v = visitRepository.save(
           Visit.builder()
               .id(-1)
@@ -84,103 +109,101 @@ public class VisitService {
               .office(office)
               .build());
     } catch (Exception e) {
-      return Either.left(VisitCreationResult.REPOSITORY_PROBLEM);
+      String message = "the date is not available or some other unknown error";
+      log.error(message);
+      throw new VisitSystemException(message, Status.PLANNED, VisitCreationResult.REPOSITORY_PROBLEM);
     }
-    return Either.right(v);
+    log.info(String.format("Created visit: %s", req.toString()));
+    return v;
   }
 
-  /*
-  *    added checking for overlapping visits in the office
+  public Visit delete(@NotNull int id) {
+    var visit = getVisitById(id);
+    try {
+      visitRepository.delete(visit);
+      log.info(String.format("Visit %s deleted", id));
+      return visit;
+    } catch (Exception e) {
+      String message = String.format("An attempt to delete a visit: %s to the database has failed", visit);
+      log.error(message);
+      throw new DeleteVetAppException(message, VetAppResourceType.VISIT);
+    }
+  }
+
+  /**
+   * added checking for overlapping visits in the office
    */
   private boolean dateAvailable(LocalDateTime startTime, Duration duration, VisitRequest req) {
     List<Visit> overlaps = visitRepository
-        .overlaps(startTime, startTime.plusMinutes(duration.toMinutes()), req.getOfficeId(), req.getVetId());
-    overlaps.forEach(x -> log.info(x.toString()));
+        .overlaps(startTime, startTime.plusMinutes(duration.toMinutes()), req.getOfficeId(),
+            req.getVetId());
     var result = ChronoUnit.MINUTES.between(startTime, LocalDateTime.now());
     return overlaps.isEmpty() && -result > 60;
   }
 
-  public Optional<Visit> delete(@NotNull int id) {
-    var visit = visitRepository.findById(id);
-    return Optional.of(visit).map(v -> {
-      visitRepository.deleteById(v.get().getId());
-      return v;
-    }).orElseGet(() -> {
-      log.info(String.format("Visit with such id: %x was not found", id));
-      return Optional.empty();
-    });
-  }
-
-  public Optional<Visit> getVisitById(@NotNull int id) {
-    return visitRepository.findById(id);
-  }
-
-  public Optional<Visit> updateVisitStatus(int id, Status status) {
-    var visit = visitRepository.findById(id);
-    if (visit.isPresent()) {
-      try {
-        log.info("Updating DB");
-        visitRepository.updateStatus(id, status);
-      } catch (Exception e) {
-        System.out.println(e.fillInStackTrace());
-        return Optional.empty();
-      }
-      log.info("DB update success");
-      return visit;
-    } else {
-      return Optional.empty();
+  public Visit updateVisitStatus(int id, Status status) {
+    var visit = getVisitById(id);
+    try {
+      log.info(String.format("Updating visit: %s status to: %s", id, status));
+      visitRepository.updateStatus(id, status);
+    } catch (Exception e) {
+      String message = "updating failed";
+      log.error(message);
+      throw new VisitSystemException(message, status, VisitCreationResult.REPOSITORY_PROBLEM);
     }
-  }
-
-  public Optional<Visit> changeVisitStatus(@NotNull int vetId, @NotNull int visitId, @NotNull int status) {
-    Status newStatus = Status.values()[status];
-    var visit = visitRepository.findById(visitId);
-    var vet = vetRepository.findById(vetId);
-    if (visit.isEmpty()){
-      log.info("visit not found");
-      return Optional.empty();
-    }
-
-    if (vet.isEmpty()){
-      log.info("vet not found");
-      return Optional.empty();
-    }
-
-    if(visit.get().getVet().getId()!=vetId){
-      log.info("this vet is not responsible for this visit");
-      return Optional.empty();
-    }
-
-    visitRepository.updateStatus(visitId,newStatus);
     return visit;
   }
 
-  public List<LocalDateTime> searchTerms(LocalDateTime start, LocalDateTime end, int officeId, int vetId) {
+  public Visit changeVisitStatus(@NotNull int vetId, @NotNull int visitId,
+      @NotNull int status) {
+    Status newStatus = Status.values()[status];
+    var visit = getVisitById(visitId);
+    var vet = vetRepository
+            .findById(vetId)
+            .orElseThrow(() -> {
+              String message = String.format("Wrong id: %s", vetId);
+              log.error(message);
+              throw new ObjectNotFoundVetAppException(message, VetAppResourceType.VET);
+            });
+
+    if (visit.getVet().getId() != vet.getId()) {
+      String message = "this vet is not responsible for this visit";
+      log.error(message);
+      throw new VisitSystemException(message, Status.NONE, VisitCreationResult.COMPATIBILITY_PROBLEM);
+    }
+
+    visitRepository.updateStatus(visitId, newStatus);
+    return visit;
+  }
+
+  public List<LocalDateTime> searchTerms(LocalDateTime start, LocalDateTime end, int officeId,
+      int vetId) {
+    log.info("searching avaliable appointments - visit service");
     List<LocalDateTime> prohibitedTerms = new ArrayList<>();
     var overlapped = visitRepository.findVisitsByTimePeriod(start, end, officeId, vetId);
     overlapped.forEach(x -> {
-          prohibitedTerms.add(x.getStartTime());
-          prohibitedTerms.add(x.getStartTime().plus(x.getDuration()));
-        });
-    List<LocalDateTime> slots = new ArrayList<>() ;
-    LocalDateTime x = start;
+      prohibitedTerms.add(x.getStartTime());
+      prohibitedTerms.add(x.getStartTime().plus(x.getDuration()));
+    });
+    List<LocalDateTime> slots = new ArrayList<>();
+    LocalDateTime time = start;
     int index = 0;
-    while (x.isBefore(end)) {
+    while (time.isBefore(end)) {
 
       boolean endLoop = index > prohibitedTerms.size() - 1;
-      if(!endLoop && x.isBefore(prohibitedTerms.get(index))) {
-        slots.add(x);
-        x = x.plusMinutes(15);
-      } else if(endLoop) {
+      if (!endLoop && time.isBefore(prohibitedTerms.get(index))) {
+        slots.add(time);
+        time = time.plusMinutes(15);
+      } else if (endLoop) {
         break;
       } else {
-        x = prohibitedTerms.get(index + 1);
+        time = prohibitedTerms.get(index + 1);
         index += 2;
       }
     }
-    while (x.isBefore(end)) {
-      slots.add(x);
-      x = x.plusMinutes(15);
+    while (time.isBefore(end)) {
+      slots.add(time);
+      time = time.plusMinutes(15);
     }
     return slots;
   }

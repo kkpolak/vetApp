@@ -35,11 +35,8 @@ public class VisitsRestController {
   //@GetMapping(path = "/{id}", produces = "application/hal+json")
   @GetMapping(path = "/{id}", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
   public ResponseEntity<?> getVisit(@PathVariable int id) {
-    var visit = visitsService.getVisitById(id);
-    if (visit.isEmpty()) {
-      return ResponseEntity.notFound().build();
-    }
-    var result = visit.get();
+    log.info("Getting visit by id - controller");
+    var result = visitsService.getVisitById(id);
     Link linkVisit = linkTo(VisitsRestController.class).slash(id).withSelfRel();
     Link linkAnimal = linkTo(AnimalRestController.class).slash(result.getAnimal().getId())
         .withSelfRel();
@@ -57,6 +54,7 @@ public class VisitsRestController {
   //@GetMapping(path = "/all", produces = "application/hal+json")
   @GetMapping(path = "/all", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
   public CollectionModel<Visit> getAllVisits() {
+    log.info("Getting all visits - controller");
     var visits = visitsService.getAllVisits();
     visits.forEach(
         visit -> visit.add(linkTo(VisitsRestController.class).slash(visit.getId()).withSelfRel()));
@@ -67,12 +65,8 @@ public class VisitsRestController {
   //@PostMapping(path = "/create", produces = "application/hal+json")
   @PostMapping(path = "/create", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
   public ResponseEntity<?> createVisit(@RequestBody VisitRequest visitReq) {
-    var visit = visitsService.createVisit(visitReq);
-
-    if (visit.isLeft()) {
-      return visitCreationResultToBadRequest(visit.left().get());
-    }
-    var result = visit.get();
+    log.info("Creating visit - controller");
+    var result = visitsService.createVisit(visitReq);
     Link linkVisit = linkTo(VisitsRestController.class).slash(result.getId()).withSelfRel();
     Link linkAnimal = linkTo(AnimalRestController.class).slash(result.getAnimal().getId())
         .withSelfRel();
@@ -90,11 +84,8 @@ public class VisitsRestController {
   //@DeleteMapping(path = "/delete/{id}", produces = "application/hal+json")
   @DeleteMapping(path = "/delete/{id}", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
   public ResponseEntity<?> deleteVisit(@PathVariable int id) {
-    var visit = visitsService.delete(id);
-    if (visit.isEmpty()) {
-      return ResponseEntity.notFound().build();
-    }
-    var result = visit.get();
+    log.info("Deleting visit - controller");
+    var result = visitsService.delete(id);
     Link linkVisit = linkTo(VisitsRestController.class).slash(id).withSelfRel();
     Link linkAnimal = linkTo(AnimalRestController.class).slash(result.getAnimal().getId())
         .withSelfRel();
@@ -116,34 +107,24 @@ public class VisitsRestController {
     try {
       newStatus = Status.valueOf(status);
     } catch (Exception e) {
+      log.error("Unknown status");
       return ResponseEntity.badRequest().body("{\"reason\": \"Unknown status\"}");
     }
     var result = visitsService.updateVisitStatus(id, newStatus);
-    return result.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    log.info(String.format("Updated status of visit %s to: %s - controller", id, status));
+    return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
   @PatchMapping(path = "update/{vetId}/{visitId}/{status}")
   public ResponseEntity<?> updateStatusByVet(@PathVariable("vetId") int vetId,
       @PathVariable("visitId") int visitId, @PathVariable("status") @Min(1) @Max(2) int status) {
     var result = visitsService.changeVisitStatus(vetId, visitId, status);
-    return result.map(ResponseEntity::ok).orElse(ResponseEntity.badRequest().build());
+    log.info(String.format("Updated status of visit %s to: %s - controller", visitId, status));
+    return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
   private ResponseEntity<?> visitToResult(Visit visit) {
     return ResponseEntity.status(HttpStatus.CREATED).body(visit);
-  }
-
-  private ResponseEntity<?> visitCreationResultToBadRequest(VisitCreationResult result) {
-    switch (result) {
-      case OVERLAP:
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-            .body("{\"reason\": \"Overlapping with other visit.\"}");
-      case REPOSITORY_PROBLEM:
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body("{\"reason\": \"Problem with server, please try again later.\"}");
-      default:
-        return ResponseEntity.badRequest().body("{\"reason\": \"Unknown.\"}");
-    }
   }
 
   @PostMapping(path = "/search")
@@ -153,6 +134,7 @@ public class VisitsRestController {
     int officeId = searchRequest.getOfficeId();
     int vetId = searchRequest.getVetId();
     var terms = visitsService.searchTerms(start, end, officeId, vetId);
+    log.info(String.format("In searching terms functionality found following %s", terms.toString()));
     return ResponseEntity.status(HttpStatus.CREATED).body(terms);
   }
 }

@@ -13,6 +13,10 @@ import uj.pwkp.gr1.vet.VetApp.controller.rest.request.ClientRequest;
 import uj.pwkp.gr1.vet.VetApp.controller.rest.request.VetRequest;
 import uj.pwkp.gr1.vet.VetApp.entity.Animal;
 import uj.pwkp.gr1.vet.VetApp.entity.Client;
+import uj.pwkp.gr1.vet.VetApp.exception.VetAppResourceType;
+import uj.pwkp.gr1.vet.VetApp.exception.exceptions.CreateVetAppException;
+import uj.pwkp.gr1.vet.VetApp.exception.exceptions.DeleteVetAppException;
+import uj.pwkp.gr1.vet.VetApp.exception.exceptions.ObjectNotFoundVetAppException;
 import uj.pwkp.gr1.vet.VetApp.repository.ClientRepository;
 
 @Slf4j
@@ -26,14 +30,22 @@ public class ClientService {
 //  private AnimalRepository animalRepository;
 
   public List<Client> getAllClients() {
+    log.info("Getting all clients - service");
     return clientRepository.findAll();
   }
 
-  public Optional<Client> getClientById(int id) {
-    return clientRepository.findById(id);
+  public Client getClientById(int id) {
+    var result = clientRepository.findById(id);
+    log.info("Getting client by id: " + id);
+    return result.orElseThrow(() -> {
+          String message = String.format("Wrong client  id: %s ", id);
+          log.error(message);
+          throw new ObjectNotFoundVetAppException(message,
+                  VetAppResourceType.CLIENT);
+        });
   }
 
-  public Either<String, Client> createClient(ClientRequest req) {
+  public Client createClient(ClientRequest req) {
     Client c;
     try {
       //List<Animal> animalList = animalRepository.findAllById(req.getAnimalIdList());
@@ -43,21 +55,23 @@ public class ClientService {
           //.animals(animalList)
           .build());
     } catch (Exception e) {
-      return Either.left("Client creation error");
+      String message = String.format("An attempt to add a client: %s to the database has failed", req.toString());
+      log.error(message);
+      throw new CreateVetAppException(message, VetAppResourceType.CLIENT);
     }
-
-    return Either.right(c);
+    log.info(String.format("Client %s created", req.toString()));
+    return c;
   }
 
-  public Optional<Client> delete(@NotNull int id) {
-    var client = clientRepository.findById(id);
-    return Optional.ofNullable(client).map(c -> {
-      clientRepository.deleteById(c.get().getId());
-      return c;
-    }).orElseGet(()->{
-      log.info(String.format("Client with such id: %x was not found",id));
-      return Optional.empty();
-    });
+  public Client delete(@NotNull int id) {
+    var client = getClientById(id);
+    try {
+      clientRepository.delete(client);
+      return client;
+    } catch (Exception e) {
+      String message = String.format("An attempt to add a client: %s to the database has failed", client);
+      log.error(message);
+      throw new DeleteVetAppException(message, VetAppResourceType.CLIENT);
+    }
   }
-
 }

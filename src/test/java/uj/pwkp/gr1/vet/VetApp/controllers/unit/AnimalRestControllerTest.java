@@ -1,6 +1,5 @@
 package uj.pwkp.gr1.vet.VetApp.controllers.unit;
 
-import io.vavr.control.Either;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -17,21 +16,19 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uj.pwkp.gr1.vet.VetApp.controller.rest.AnimalRestController;
-import uj.pwkp.gr1.vet.VetApp.controller.rest.ClientRestController;
 import uj.pwkp.gr1.vet.VetApp.controller.rest.request.AnimalRequest;
-import uj.pwkp.gr1.vet.VetApp.controller.rest.request.ClientRequest;
 import uj.pwkp.gr1.vet.VetApp.entity.Animal;
 import uj.pwkp.gr1.vet.VetApp.entity.AnimalType;
 import uj.pwkp.gr1.vet.VetApp.entity.Client;
+import uj.pwkp.gr1.vet.VetApp.exception.VetAppResourceType;
+import uj.pwkp.gr1.vet.VetApp.exception.exceptions.CreateVetAppException;
+import uj.pwkp.gr1.vet.VetApp.exception.exceptions.DeleteVetAppException;
+import uj.pwkp.gr1.vet.VetApp.exception.exceptions.ObjectNotFoundVetAppException;
 import uj.pwkp.gr1.vet.VetApp.service.AnimalService;
 
-import java.time.Clock;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
@@ -89,7 +86,7 @@ public class AnimalRestControllerTest {
                 .type(AnimalType.CAT)
                 .owner(client)
                 .build();
-        given(animalService.getAnimalById(1)).willReturn(Optional.ofNullable(animal));
+        given(animalService.getAnimalById(1)).willReturn(animal);
         String uri = "/api/animals/1";
 
         mvc.perform(get(uri)
@@ -100,7 +97,7 @@ public class AnimalRestControllerTest {
 
     @Test
     public void givenAnimalId_whenGetAnimalById_thenReturnJsonWithNotFound() throws Exception {
-        given(animalService.getAnimalById(1)).willReturn(Optional.empty());
+        given(animalService.getAnimalById(1)).willThrow(new ObjectNotFoundVetAppException("", VetAppResourceType.ANIMAL));
         String uri = "/api/animals/1";
 
         mvc.perform(get(uri)
@@ -124,33 +121,7 @@ public class AnimalRestControllerTest {
                 .type(AnimalType.CAT)
                 .owner(client)
                 .build();
-        Either<String, Animal> res = new Either<>() {
-            @Override
-            public String getLeft() {
-                return null;
-            }
-
-            @Override
-            public boolean isLeft() {
-                return false;
-            }
-
-            @Override
-            public boolean isRight() {
-                return true;
-            }
-
-            @Override
-            public Animal get() {
-                return animal;
-            }
-
-            @Override
-            public String stringPrefix() {
-                return null;
-            }
-        };
-        given(animalService.createAnimal(animalRequest)).willReturn(res);
+        given(animalService.createAnimal(animalRequest)).willReturn(animal);
         String uri = "/api/animals/create";
         ObjectMapper mapper = new ObjectMapper();
         RequestBuilder requestBuilder = MockMvcRequestBuilders
@@ -171,45 +142,7 @@ public class AnimalRestControllerTest {
     public void givenAnimalRequest_whenCreateAnimal_thenReturnJsonWithBadRequest() throws Exception {
         //given
         AnimalRequest animalRequest = new AnimalRequest(null, AnimalType.CAT, 1, "animal");
-        Client client = Client.builder()
-                .id(1)
-                .firstName("John")
-                .lastName("Doe")
-                .build();
-        Animal animal = Animal.builder()
-                .id(1)
-                .name("animal")
-                .dateOfBirth(null)
-                .type(AnimalType.CAT)
-                .owner(client)
-                .build();
-        Either<String, Animal> res = new Either<>() {
-            @Override
-            public String getLeft() {
-                return "animal creation error";
-            }
-
-            @Override
-            public boolean isLeft() {
-                return true;
-            }
-
-            @Override
-            public boolean isRight() {
-                return false;
-            }
-
-            @Override
-            public Animal get() {
-                return null;
-            }
-
-            @Override
-            public String stringPrefix() {
-                return null;
-            }
-        };
-        given(animalService.createAnimal(animalRequest)).willReturn(res);
+        given(animalService.createAnimal(animalRequest)).willThrow(new CreateVetAppException("", VetAppResourceType.ANIMAL));
         String uri = "/api/animals/create";
         ObjectMapper mapper = new ObjectMapper();
         RequestBuilder requestBuilder = MockMvcRequestBuilders
@@ -222,8 +155,8 @@ public class AnimalRestControllerTest {
 
         //then
         MockHttpServletResponse response = result.getResponse();
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
-        Assertions.assertTrue(response.getContentAsString().equals("animal creation error"));
+        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), response.getStatus());
+//        Assertions.assertTrue(response.getContentAsString().contains("An attempt to add a animal: 1 to the database has failed"));
     }
 
     @Test
@@ -241,7 +174,7 @@ public class AnimalRestControllerTest {
                 .type(AnimalType.CAT)
                 .owner(client)
                 .build();
-        given(animalService.delete(1)).willReturn(Optional.ofNullable(animal));
+        given(animalService.delete(1)).willReturn(animal);
         String uri = "/api/animals/delete/1";
 
         //when
@@ -256,7 +189,7 @@ public class AnimalRestControllerTest {
     @Test
     public void givenAnimalId_whenDeleteWrongId_thenReturnJsonWithNotFound() throws Exception {
         //given
-        given(animalService.delete(1)).willReturn(Optional.empty());
+        given(animalService.delete(1)).willThrow(new DeleteVetAppException("", VetAppResourceType.ANIMAL));
         String uri = "/api/animals/delete/1";
 
         //when
@@ -264,6 +197,6 @@ public class AnimalRestControllerTest {
                 .contentType(MediaType.APPLICATION_JSON));
 
         //then
-        result.andExpect(status().isNotFound());
+        result.andExpect(status().isInternalServerError());
     }
 }

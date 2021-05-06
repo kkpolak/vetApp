@@ -56,7 +56,7 @@ public class VetServiceTest {
 
     var vet = vetService.getVetById(1);
 
-    assertThat(vet).isEqualTo(Optional.of(vet1));
+    assertThat(vet).isEqualTo(vet1);
   }
 
   @Test

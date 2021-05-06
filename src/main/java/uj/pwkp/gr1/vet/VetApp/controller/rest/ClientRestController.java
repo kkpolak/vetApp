@@ -2,7 +2,7 @@ package uj.pwkp.gr1.vet.VetApp.controller.rest;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
-import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
@@ -20,6 +20,7 @@ import uj.pwkp.gr1.vet.VetApp.controller.rest.request.ClientRequest;
 import uj.pwkp.gr1.vet.VetApp.entity.Client;
 import uj.pwkp.gr1.vet.VetApp.service.ClientService;
 
+@Slf4j
 @RestController
 @RequestMapping(path = "/api/clients")
 public class ClientRestController {
@@ -30,11 +31,8 @@ public class ClientRestController {
   //@GetMapping(path = "/{id}", produces = "application/hal+json")
   @GetMapping(path = "/{id}", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
   public ResponseEntity<?> getClient(@PathVariable int id) {
-    var client = clientService.getClientById(id);
-    if (client.isEmpty()) {
-      return ResponseEntity.notFound().build();
-    }
-    var result = client.get();
+    log.info("Getting client by id - controller");
+    var result = clientService.getClientById(id);
     Link linkClient = linkTo(ClientRestController.class).slash(id).withSelfRel();
     result.add(linkClient);
     return new ResponseEntity<>(result, HttpStatus.OK);
@@ -43,6 +41,7 @@ public class ClientRestController {
   //@GetMapping(path = "/all", produces = "application/hal+json")
   @GetMapping(path = "/all", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
   public CollectionModel<Client> getAllClients() {
+    log.info("Getting all clients - controller");
     var clients = clientService.getAllClients();
     clients.forEach(c -> c.add(linkTo(ClientRestController.class).slash(c.getId()).withSelfRel()));
     Link link = linkTo(ClientRestController.class).withSelfRel();
@@ -52,11 +51,8 @@ public class ClientRestController {
   //@PostMapping(path = "/create", produces = "application/hal+json")
   @PostMapping(path = "/create", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
   public ResponseEntity<?> createClient(@RequestBody ClientRequest clientRequest) {
-    var client = clientService.createClient(clientRequest);
-    if (client.isLeft()) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(client.left().get());
-    }
-    var result = client.right().get();
+    log.info("Creating client - controller");
+    var result = clientService.createClient(clientRequest);
     Link linkClient = linkTo(ClientRestController.class).slash(result.getId()).withSelfRel();
     result.add(linkClient);
     return new ResponseEntity<>(result, HttpStatus.OK);
@@ -65,11 +61,8 @@ public class ClientRestController {
   //@DeleteMapping(path = "/delete/{id}", produces = "application/hal+json")
   @DeleteMapping(path = "/delete/{id}", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
   public ResponseEntity<?> deleteClient(@PathVariable int id) {
-    var client = clientService.delete(id);
-    if (client.isEmpty()) {
-      return ResponseEntity.notFound().build();
-    }
-    var result = client.get();
+    log.info("Deleting client - controller");
+    var result = clientService.delete(id);
     Link linkClient = linkTo(ClientRestController.class).slash(id).withSelfRel();
     result.add(linkClient);
     return new ResponseEntity<>(result, HttpStatus.OK);

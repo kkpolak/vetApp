@@ -59,7 +59,7 @@ public class AnimalServiceTest {
 
     var animal = animalService.getAnimalById(1);
 
-    assertThat(animal).isEqualTo(Optional.of(animal1));
+    assertThat(animal).isEqualTo(animal1);
   }
 
   @Test
