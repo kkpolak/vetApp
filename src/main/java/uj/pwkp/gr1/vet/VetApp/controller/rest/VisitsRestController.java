@@ -115,7 +115,7 @@ public class VisitsRestController {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  @PatchMapping(path = "update/{vetId}/{visitId}/{status}")
+  @PatchMapping(path = "/update/{vetId}/{visitId}/{status}")
   public ResponseEntity<?> updateStatusByVet(@PathVariable("vetId") int vetId,
       @PathVariable("visitId") int visitId, @PathVariable("status") @Min(1) @Max(2) int status) {
     var result = visitsService.changeVisitStatus(vetId, visitId, status);

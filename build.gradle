@@ -31,6 +31,9 @@ dependencies {
 	implementation 'com.vladmihalcea:hibernate-types-52:2.10.2'
 	implementation group: 'org.codehaus.jackson', name: 'jackson-mapper-asl', version: '1.9.13'
 	implementation 'junit:junit:4.12'
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.5.0'
+	implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.9.3'
+	implementation 'commons-codec:commons-codec:1.15'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'
@@ -40,6 +43,7 @@ dependencies {
 	compile 'io.vavr:vavr-beanvalidation2:0.10.0'
 	compile "org.flywaydb:flyway-core:7.7.3"
 	testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.4.5'
+	testImplementation 'org.springframework.security:spring-security-test'
 	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
 	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
 }
@@ -53,8 +57,8 @@ jacocoTestReport {
 	dependsOn test
 }
 
-//flyway {
-//	url = 'jdbc:postgresql://localhost:5432/vetAppDB'
-//	user = 'postgres'
-//	password = 'postgres'
-//}
+flyway {
+	url = 'jdbc:postgresql://ec2-54-73-68-39.eu-west-1.compute.amazonaws.com:5432/dfhoaf8t88lc2m'//'jdbc:postgresql://localhost:5432/vetAppDB'
+	user = 'ixsonxtwrwbavc'//'postgres'
+	password = '5fe0670eabde6132e56882f95b059a4f2ec2d2fd7f7f68e916892cf8f93444cb'//'postgres'
+}
