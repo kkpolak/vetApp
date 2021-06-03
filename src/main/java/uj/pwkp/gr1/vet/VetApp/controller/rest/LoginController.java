@@ -6,14 +6,13 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import uj.pwkp.gr1.vet.VetApp.controller.rest.request.UserRequest;
 import uj.pwkp.gr1.vet.VetApp.security.JwtGenerator;
 import uj.pwkp.gr1.vet.VetApp.service.UserDetailsServiceImpl;
 
 @RestController
+@RequestMapping("/login")
 public class LoginController {
 
     private final AuthenticationManager authenticationManager;
@@ -25,7 +24,7 @@ public class LoginController {
         this.userDetailsService = userDetailsService;
     }
 
-    @PostMapping("/login")
+    @PostMapping
     public ResponseEntity<?> login(@RequestBody UserRequest userRequest) throws Exception {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userRequest.getUsername(), userRequest.getPassword()));

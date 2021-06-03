@@ -5,5 +5,6 @@ public enum VetAppResourceType {
   CLIENT,
   OFFICE,
   VET,
-  VISIT
+  VISIT,
+  USER
 }

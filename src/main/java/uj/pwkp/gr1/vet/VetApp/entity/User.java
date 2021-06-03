@@ -1,19 +1,19 @@
 package uj.pwkp.gr1.vet.VetApp.entity;
 
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
 @Entity
 @Data
-@NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
+@AllArgsConstructor
+@Builder
 @Table(name = "users")
 public class User implements UserDetails {
 
@@ -22,17 +22,30 @@ public class User implements UserDetails {
     private Long id;
     private final String username;
     private final String password;
-    private final String role;
+    private final UserRole role;
 
-    public User(String username, String password, String role) {
-        this.username = username;
-        this.password = password;
-        this.role = role;
+    public static User newUser(String username, String password, UserRole role) {
+        return User.builder()
+                .id(-1L)
+                .username(username)
+                .password(password)
+                .role(role)
+                .build();
+    }
+
+    protected User() {
+        id = 0L;
+        username = null;
+        password = null;
+        role= null;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority(role));
+        if(role == null) {
+            return Collections.emptyList();
+        }
+        return Collections.singletonList(new SimpleGrantedAuthority(role.name()));
     }
 
     @Override
