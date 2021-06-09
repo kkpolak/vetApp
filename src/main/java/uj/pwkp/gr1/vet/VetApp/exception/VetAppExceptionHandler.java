@@ -1,8 +1,10 @@
 package uj.pwkp.gr1.vet.VetApp.exception;
 
 import java.time.ZonedDateTime;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,12 +15,14 @@ import uj.pwkp.gr1.vet.VetApp.exception.exceptions.DeleteVetAppException;
 import uj.pwkp.gr1.vet.VetApp.exception.exceptions.ObjectNotFoundVetAppException;
 import uj.pwkp.gr1.vet.VetApp.exception.exceptions.VisitSystemException;
 
+@Slf4j
 @RestControllerAdvice(annotations = RestController.class)
 public class VetAppExceptionHandler {
 
   @ResponseStatus(HttpStatus.NOT_FOUND)
   @ExceptionHandler(value = {ObjectNotFoundVetAppException.class})
-  public ResponseEntity<Object> handleVetAppException(ObjectNotFoundVetAppException e) {
+  public ResponseEntity<Object> handleVetAppException(
+      ObjectNotFoundVetAppException e) {
     var vetAppExceptionResponse = VetAppExceptionResponse.builder()
         .message(e.getMessage())
         .throwable(e)
@@ -26,12 +30,14 @@ public class VetAppExceptionHandler {
         .timeStamp(ZonedDateTime.now())
         .type(e.getType())
         .build();
-    return new ResponseEntity<>(vetAppExceptionResponse, HttpStatus.NOT_FOUND);
+    return new ResponseEntity<>(vetAppExceptionResponse,
+        HttpStatus.NOT_FOUND);
   }
 
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   @ExceptionHandler(value = {CreateVetAppException.class})
-  public ResponseEntity<Object> handleVetAppException(CreateVetAppException e) {
+  public ResponseEntity<Object> handleVetAppException(
+      CreateVetAppException e) {
     var vetAppExceptionResponse = VetAppExceptionResponse.builder()
         .message(e.getMessage())
         .throwable(e)
@@ -39,12 +45,14 @@ public class VetAppExceptionHandler {
         .timeStamp(ZonedDateTime.now())
         .type(e.getType())
         .build();
-    return new ResponseEntity<>(vetAppExceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    return new ResponseEntity<>(vetAppExceptionResponse,
+        HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   @ExceptionHandler(value = {DeleteVetAppException.class})
-  public ResponseEntity<Object> handleVetAppException(DeleteVetAppException e) {
+  public ResponseEntity<Object> handleVetAppException(
+      DeleteVetAppException e) {
     var vetAppExceptionResponse = VetAppExceptionResponse.builder()
         .message(e.getMessage())
         .throwable(e)
@@ -52,12 +60,14 @@ public class VetAppExceptionHandler {
         .timeStamp(ZonedDateTime.now())
         .type(e.getType())
         .build();
-    return new ResponseEntity<>(vetAppExceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    return new ResponseEntity<>(vetAppExceptionResponse,
+        HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ExceptionHandler(value = {BadRequestVetAppException.class})
-  public ResponseEntity<Object> handleVetAppException(BadRequestVetAppException e) {
+  public ResponseEntity<Object> handleVetAppException(
+      BadRequestVetAppException e) {
     var vetAppExceptionResponse = VetAppExceptionResponse.builder()
         .message(e.getMessage())
         .throwable(e)
@@ -65,13 +75,16 @@ public class VetAppExceptionHandler {
         .timeStamp(ZonedDateTime.now())
         .type(e.getType())
         .build();
-    return new ResponseEntity<>(vetAppExceptionResponse, HttpStatus.BAD_REQUEST);
+    return new ResponseEntity<>(vetAppExceptionResponse,
+        HttpStatus.BAD_REQUEST);
   }
 
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ExceptionHandler(value = {VisitSystemException.class})
-  public ResponseEntity<Object> handleVetAppException(VisitSystemException e) {
-    var visitExceptionResponse = VisitSystemExceptionResponse.builder()
+  public ResponseEntity<Object> handleVetAppException(
+      VisitSystemException e) {
+    var visitExceptionResponse = VisitSystemExceptionResponse
+        .builder()
         .message(e.getMessage())
         .throwable(e)
         .httpStatus(HttpStatus.BAD_REQUEST)
@@ -79,7 +92,15 @@ public class VetAppExceptionHandler {
         .visitCreationResult(e.getVisitCreationResult())
         .visitStatus(e.getVisitStatus())
         .build();
-    return new ResponseEntity<>(visitExceptionResponse, HttpStatus.BAD_REQUEST);
+    return new ResponseEntity<>(visitExceptionResponse,
+        HttpStatus.BAD_REQUEST);
   }
 
+  @ExceptionHandler(Exception.class)
+  public ResponseEntity<String> handleException(Exception ex) {
+    log.warn("UNUSUAL EXCEPTION");
+    return ResponseEntity
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .body("Exception: " + ex.getLocalizedMessage());
+  }
 }

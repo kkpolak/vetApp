@@ -30,7 +30,6 @@ public class ClientRestController {
   @Autowired
   private ClientService clientService;
 
-  //@GetMapping(path = "/{id}", produces = "application/hal+json")
   @GetMapping(path = "/{id}", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
   public ResponseEntity<?> getClient(@PathVariable int id) {
     log.info("Getting client by id - controller");
@@ -40,7 +39,6 @@ public class ClientRestController {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  //@GetMapping(path = "/all", produces = "application/hal+json")
   @GetMapping(path = "/all", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
   public CollectionModel<Client> getAllClients() {
     log.info("Getting all clients - controller");
@@ -50,7 +48,6 @@ public class ClientRestController {
     return CollectionModel.of(clients, link);
   }
 
-  //@PostMapping(path = "/create", produces = "application/hal+json")
   @PostMapping(path = "/create", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
   public ResponseEntity<?> createClient(@RequestBody ClientRequest clientRequest) {
     log.info("Creating client - controller");
@@ -60,7 +57,6 @@ public class ClientRestController {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  //@DeleteMapping(path = "/delete/{id}", produces = "application/hal+json")
   @DeleteMapping(path = "/delete/{id}", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
   public ResponseEntity<?> deleteClient(@PathVariable int id) {
     log.info("Deleting client - controller");

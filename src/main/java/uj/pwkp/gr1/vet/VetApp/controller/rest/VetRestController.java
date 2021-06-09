@@ -31,7 +31,6 @@ public class VetRestController {
   @Autowired
   private VetService vetService;
 
-  //@GetMapping(path = "/{id}", produces = "application/hal+json")
   @GetMapping(path = "/{id}", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
   public ResponseEntity<Vet> getVet(@PathVariable int id) {
     log.info("Getting vet by id - controller");
@@ -41,7 +40,6 @@ public class VetRestController {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  //@GetMapping(path = "/all", produces = "application/hal+json")
   @GetMapping(path = "/all", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
   public CollectionModel<Vet> getAllVets() {
     log.info("Getting all vets - controller");
@@ -51,7 +49,6 @@ public class VetRestController {
     return CollectionModel.of(vets, link);
   }
 
-  //@PostMapping(path = "/create", produces = "application/hal+json")
   @PostMapping(path = "/create", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
   public ResponseEntity<Vet> createVet(@RequestBody VetRequest vetRequest) {
     log.info("Creating vet - controller");
@@ -61,7 +58,6 @@ public class VetRestController {
     return ResponseEntity.status(HttpStatus.CREATED).body(result);
   }
 
-  //@DeleteMapping(path = "/delete/{id}", produces = "application/hal+json")
   @DeleteMapping(path = "/delete/{id}", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
   ResponseEntity<Vet> deleteVet(@PathVariable int id) {
     log.info("Deleting vet - controller");
