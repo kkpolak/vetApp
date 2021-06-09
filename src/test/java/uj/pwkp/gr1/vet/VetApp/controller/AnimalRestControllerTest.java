@@ -1,24 +1,29 @@
-package uj.pwkp.gr1.vet.VetApp.controllers.unit;
+package uj.pwkp.gr1.vet.VetApp.controller;
 
 import org.codehaus.jackson.map.ObjectMapper;
+import org.junit.Before;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uj.pwkp.gr1.vet.VetApp.controller.rest.AnimalRestController;
 import uj.pwkp.gr1.vet.VetApp.controller.rest.request.AnimalRequest;
 import uj.pwkp.gr1.vet.VetApp.entity.Animal;
@@ -28,7 +33,9 @@ import uj.pwkp.gr1.vet.VetApp.exception.VetAppResourceType;
 import uj.pwkp.gr1.vet.VetApp.exception.exceptions.CreateVetAppException;
 import uj.pwkp.gr1.vet.VetApp.exception.exceptions.DeleteVetAppException;
 import uj.pwkp.gr1.vet.VetApp.exception.exceptions.ObjectNotFoundVetAppException;
+import uj.pwkp.gr1.vet.VetApp.repository.ClientRepository;
 import uj.pwkp.gr1.vet.VetApp.service.AnimalService;
+import uj.pwkp.gr1.vet.VetApp.service.UserDetailsServiceImpl;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -44,6 +51,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
+@ComponentScan(basePackages = "uj.pwkp.gr1.vet.VetApp.exception")
+@ContextConfiguration(classes = {ClientRepository.class, AnimalService.class, AnimalRestController.class })
 @WebMvcTest(AnimalRestController.class)
 @AutoConfigureMockMvc(addFilters = false)
 public class AnimalRestControllerTest {

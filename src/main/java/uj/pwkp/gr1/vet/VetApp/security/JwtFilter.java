@@ -5,12 +5,17 @@ import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import uj.pwkp.gr1.vet.VetApp.entity.TokenBlackList;
+import uj.pwkp.gr1.vet.VetApp.exception.VetAppResourceType;
+import uj.pwkp.gr1.vet.VetApp.exception.exceptions.BadRequestVetAppException;
+import uj.pwkp.gr1.vet.VetApp.repository.TokenBlackListRepository;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -24,9 +29,11 @@ import java.util.Set;
 
 public class JwtFilter extends BasicAuthenticationFilter {
     static String secret = "2qq9sVdJx1mSEPU6LhnXV242HdAd7STT";
+    private final TokenBlackListRepository tokenBlackListRepository;
 
-    public JwtFilter(AuthenticationManager authenticationManager) {
+    public JwtFilter(AuthenticationManager authenticationManager, TokenBlackListRepository tokenBlackListRepository) {
         super(authenticationManager);
+        this.tokenBlackListRepository = tokenBlackListRepository;
     }
 
     @Override
@@ -38,6 +45,11 @@ public class JwtFilter extends BasicAuthenticationFilter {
         String jwt;
         if(header != null && header.startsWith("Bearer ")) {
             jwt = header.substring(7);
+            TokenBlackList blackListToken = tokenBlackListRepository.findTokenBlackListByTokenEquals(jwt);
+            if(blackListToken != null) {
+//                throw new BadRequestVetAppException("Invalid token", VetAppResourceType.USER);
+                ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED, "The token is not valid.");
+            }
             SignedJWT signedJWT = null;
             try {
                 signedJWT = SignedJWT.parse(jwt);

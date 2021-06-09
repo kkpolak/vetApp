@@ -1,4 +1,4 @@
-package uj.pwkp.gr1.vet.VetApp.controllers.unit;
+package uj.pwkp.gr1.vet.VetApp.controller;
 
 import io.vavr.control.Either;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -9,9 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -44,6 +46,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
+@ComponentScan(basePackages = "uj.pwkp.gr1.vet.VetApp.exception")
+@ContextConfiguration(classes = {VisitsRestController.class })
 @WebMvcTest(VisitsRestController.class)
 @AutoConfigureMockMvc(addFilters = false)
 public class VisitRestControllerTest {
