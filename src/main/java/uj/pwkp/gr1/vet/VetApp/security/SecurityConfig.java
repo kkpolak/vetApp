@@ -49,13 +49,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.cors().and().csrf().disable();
 
-        httpSecurity.authorizeRequests()
-                .antMatchers("/users/**").hasRole("ADMIN")
+        httpSecurity.authorizeRequests()//.antMatchers("/**").hasAnyRole()//.permitAll()
+                .antMatchers("/users").hasRole("ADMIN")
                 .antMatchers(HttpMethod.PATCH, "/api/vet/update/**").hasAnyRole("VET", "ADMIN")
                 .antMatchers(HttpMethod.PATCH, "/api/visits/update/**").hasAnyRole("VET", "ADMIN")
 
-                .antMatchers(HttpMethod.POST, "/api/animals/**").hasAnyRole("USER", "ADMIN")
-                .antMatchers(HttpMethod.DELETE, "/api/animals/**").hasAnyRole("USER", "ADMIN")
+//                .antMatchers(HttpMethod.POST, "/api/animals/**").hasAnyRole("USER", "ADMIN")
+//                .antMatchers(HttpMethod.DELETE, "/api/animals/**").hasAnyRole("USER", "ADMIN")
                 .anyRequest().authenticated();
 
         httpSecurity.addFilter(new JwtFilter(authenticationManager()));

@@ -7,7 +7,6 @@ import org.springframework.hateoas.RepresentationModel;
 
 @Data
 @AllArgsConstructor
-//@NoArgsConstructor
 public class AnimalResponseDto extends RepresentationModel<AnimalResponseDto> {
 
 }

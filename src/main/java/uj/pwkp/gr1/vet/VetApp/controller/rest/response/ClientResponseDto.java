@@ -7,7 +7,7 @@ import org.springframework.hateoas.RepresentationModel;
 
 @Data
 @AllArgsConstructor
-//@NoArgsConstructor
+//@
 public class ClientResponseDto extends RepresentationModel<ClientResponseDto> {
 
 }
