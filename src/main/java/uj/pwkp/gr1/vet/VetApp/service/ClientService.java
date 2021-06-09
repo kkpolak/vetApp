@@ -67,12 +67,14 @@ public class ClientService {
   }
 
   public List<Animal> getClientsAnimals(int id) {
+    var check = getClientById(id);
     return animalRepository.findAll().stream()
         .filter(a -> a.getOwner().getId() == id)
         .collect(Collectors.toList());
   }
 
   public List<Visit> getClientsVisits(int id) {
+    var check = getClientById(id);
     return visitRepository.findAll().stream()
         .filter(v -> v.getClient().getId() == id).collect(
             Collectors.toList());

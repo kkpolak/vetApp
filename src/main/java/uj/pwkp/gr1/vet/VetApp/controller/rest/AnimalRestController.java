@@ -30,8 +30,6 @@ public class AnimalRestController {
   @Autowired
   private AnimalService animalService;
 
-
-  //@GetMapping(path = "/{id}", produces = "application/hal+json")
   @GetMapping(path = "/{id}", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
   public ResponseEntity<Animal> getAnimalById(@PathVariable int id) {
     log.info("Getting animal by id - controller");
@@ -44,7 +42,6 @@ public class AnimalRestController {
     return ResponseEntity.ok(result);
   }
 
-  //@GetMapping(path = "/all", produces = "application/hal+json")
   @GetMapping(path = "/all", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
   public CollectionModel<Animal> getAllAnimals() {
     log.info("Getting all animals - controller");
@@ -61,7 +58,6 @@ public class AnimalRestController {
     return CollectionModel.of(animals, link);
   }
 
-  //@PostMapping(path = "/create", produces = "application/hal+json")
   @PostMapping(path = "/create", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
   public ResponseEntity<Animal> createAnimal(@RequestBody AnimalRequest animalRequest) {
     log.info("Creating animal - controller");
@@ -74,7 +70,6 @@ public class AnimalRestController {
     return ResponseEntity.status(HttpStatus.CREATED).body(result);
   }
 
-  //@DeleteMapping(path = "/delete/{id}", produces = "application/hal+json")
   @DeleteMapping(path = "/delete/{id}", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
   ResponseEntity<Animal> deleteAnimal(@PathVariable int id) {
     log.info("Deleting animal - controller");

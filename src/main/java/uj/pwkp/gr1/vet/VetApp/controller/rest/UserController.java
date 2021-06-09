@@ -29,7 +29,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createUser(@RequestBody CreateUserRequest userRequest) {
+    public ResponseEntity<Object> createUser(@RequestBody CreateUserRequest userRequest) {
         log.info("Creating user - controller");
         var result = userDetailsService.createUser(userRequest);
         return new ResponseEntity<>(
@@ -38,7 +38,7 @@ public class UserController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable long id) {
+    public ResponseEntity<Object> deleteUser(@PathVariable long id) {
         var result = userDetailsService.deleteUser(id);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

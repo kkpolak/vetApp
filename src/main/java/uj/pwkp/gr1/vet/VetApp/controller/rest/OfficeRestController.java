@@ -22,7 +22,6 @@ public class OfficeRestController {
   @Autowired
   private OfficeService officeService;
 
-  //@GetMapping(path = "/{id}", produces = "application/hal+json")
   @GetMapping(path = "/{id}", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
   public ResponseEntity<?> getOffice(@PathVariable int id) {
     log.info("Getting office by id - controller");
@@ -32,7 +31,6 @@ public class OfficeRestController {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  //@GetMapping(path = "/all", produces = "application/hal+json")
   @GetMapping(path = "/all", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
   public CollectionModel<Office> getAllOffices() {
     log.info("Getting all offices - controller");
@@ -42,9 +40,8 @@ public class OfficeRestController {
     return CollectionModel.of(offices, link);
   }
 
-  //@PostMapping(path = "/create", produces = "application/hal+json")
   @PostMapping(path = "/create", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
-  public ResponseEntity<?> createOffice(@RequestBody OfficeRequest officeRequest) {
+  public ResponseEntity<Office> createOffice(@RequestBody OfficeRequest officeRequest) {
     log.info("Creating office - controller");
     var result = officeService.createOffice(officeRequest);
     Link linkOffice = linkTo(OfficeRestController.class).slash(result.getId()).withSelfRel();
@@ -52,9 +49,8 @@ public class OfficeRestController {
     return ResponseEntity.status(HttpStatus.CREATED).body(result);
   }
 
-  //@DeleteMapping(path = "/delete/{id}", produces = "application/hal+json")
   @DeleteMapping(path = "/delete/{id}", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
-  public ResponseEntity<?> deleteOffice(@PathVariable int id) {
+  public ResponseEntity<Office> deleteOffice(@PathVariable int id) {
     log.info("Deleting office - controller");
     var result = officeService.deleteOffice(id);
     Link linkOffice = linkTo(OfficeRestController.class).slash(id).withSelfRel();

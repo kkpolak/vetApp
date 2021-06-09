@@ -25,7 +25,7 @@ public class LoginController {
     }
 
     @PostMapping
-    public ResponseEntity<?> login(@RequestBody UserRequest userRequest) throws Exception {
+    public ResponseEntity<Object> login(@RequestBody UserRequest userRequest) throws Exception {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userRequest.getUsername(), userRequest.getPassword()));
         } catch (BadCredentialsException e) {
