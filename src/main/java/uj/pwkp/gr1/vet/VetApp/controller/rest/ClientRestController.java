@@ -98,10 +98,10 @@ public class ClientRestController {
     return ResponseEntity.ok(result);
   }
 
-  @PatchMapping("/visit/{vid}/{cid}")
-  public ResponseEntity<?> addClientsVisit(@PathVariable Integer vid,
-      @PathVariable Integer cid) {
-    var result = clientService.addClientsVisit(vid, cid);
-    return ResponseEntity.ok(result);
-  }
+//  @PatchMapping("/visit/{vid}/{cid}")
+//  public ResponseEntity<?> addClientsVisit(@PathVariable Integer vid,
+//      @PathVariable Integer cid) {
+//    var result = clientService.addClientsVisit(vid, cid);
+//    return ResponseEntity.ok(result);
+//  }
 }

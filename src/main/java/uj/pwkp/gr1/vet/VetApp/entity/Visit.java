@@ -44,6 +44,7 @@ public class Visit extends RepresentationModel<Visit> {
 
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "client_id", referencedColumnName = "id")
+//  @JoinColumn(name = "visit")
   private Client client;
 
   @OneToOne(cascade = CascadeType.ALL)

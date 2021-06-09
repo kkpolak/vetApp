@@ -1,8 +1,6 @@
 package uj.pwkp.gr1.vet.VetApp.service;
 
-import io.vavr.control.Either;
 import java.util.List;
-import java.util.Optional;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +21,9 @@ public class AnimalService {
 
   @Autowired
   private AnimalRepository animalRepository;
+
+  @Autowired
+  private ClientRepository clientRepository;
 
   @Autowired
   private ClientService clientService;
@@ -52,9 +53,15 @@ public class AnimalService {
           Animal.builder()
               .dateOfBirth(req.getDateOfBirth())
               .type(req.getType())
-              .owner(client)
+              .client(client)
               .name(req.getName())
               .build());
+
+//      var animals = client.getAnimals();
+//      animals.add(a);
+//      client.setAnimals(animals);
+//      clientRepository.save(client);
+
     } catch (Exception e) {
       String message = String.format("An attempt to add a animal: %s to the database has failed", req.toString());
       log.error(message);

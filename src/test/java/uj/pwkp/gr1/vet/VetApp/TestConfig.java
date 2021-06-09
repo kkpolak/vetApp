@@ -3,9 +3,7 @@ package uj.pwkp.gr1.vet.VetApp;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.Month;
-import java.time.temporal.TemporalUnit;
 import uj.pwkp.gr1.vet.VetApp.entity.Animal;
 import uj.pwkp.gr1.vet.VetApp.entity.AnimalType;
 import uj.pwkp.gr1.vet.VetApp.entity.Client;
@@ -31,7 +29,7 @@ public class TestConfig {
     animal1 = Animal.builder()
         .id(1)
         .name("animal1")
-        .owner(client1)
+        .client(client1)
         .type(AnimalType.DOG)
         .dateOfBirth(LocalDateTime.of(2020, Month.APRIL, 20, 19, 31, 29))
         .build();
@@ -39,7 +37,7 @@ public class TestConfig {
     animal2 = Animal.builder()
         .id(20)
         .name("animal2")
-        .owner(client2)
+        .client(client2)
         .type(AnimalType.CAT)
         .dateOfBirth(LocalDateTime.of(2017, Month.APRIL, 11, 11, 42, 47))
         .build();

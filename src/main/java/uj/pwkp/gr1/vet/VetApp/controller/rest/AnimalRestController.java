@@ -37,10 +37,10 @@ public class AnimalRestController {
     log.info("Getting animal by id - controller");
     var result = animalService.getAnimalById(id);
     Link linkAnimal = linkTo(AnimalRestController.class).slash(id).withSelfRel();
-    Link linkOwner = linkTo(ClientRestController.class).slash(result.getOwner().getId())
+    Link linkOwner = linkTo(ClientRestController.class).slash(result.getClient().getId())
         .withSelfRel();
     result.add(linkAnimal);
-    result.getOwner().add(linkOwner);
+    result.getClient().add(linkOwner);
     return ResponseEntity.ok(result);
   }
 
@@ -52,9 +52,9 @@ public class AnimalRestController {
     animals.forEach(animal -> animal
         .add(linkTo(AnimalRestController.class).slash(animal.getId()).withSelfRel()));
     animals.forEach(animal -> {
-      var owner = animal.getOwner();
+      var owner = animal.getClient();
       if(owner != null) {
-        animal.getOwner().add(linkTo(ClientRestController.class).slash(owner.getId()).withSelfRel());
+        animal.getClient().add(linkTo(ClientRestController.class).slash(owner.getId()).withSelfRel());
       }
   });
     Link link = linkTo(AnimalRestController.class).withSelfRel();
@@ -67,10 +67,10 @@ public class AnimalRestController {
     log.info("Creating animal - controller");
     var result = animalService.createAnimal(animalRequest);
     Link linkAnimal = linkTo(AnimalRestController.class).slash(result.getId()).withSelfRel();
-    Link linkOwner = linkTo(ClientRestController.class).slash(result.getOwner().getId())
+    Link linkOwner = linkTo(ClientRestController.class).slash(result.getClient().getId())
         .withSelfRel();
     result.add(linkAnimal);
-    result.getOwner().add(linkOwner);
+    result.getClient().add(linkOwner);
     return ResponseEntity.status(HttpStatus.CREATED).body(result);
   }
 
@@ -80,10 +80,10 @@ public class AnimalRestController {
     log.info("Deleting animal - controller");
     var result = animalService.delete(id);
     Link linkAnimal = linkTo(AnimalRestController.class).slash(id).withSelfRel();
-    Link linkOwner = linkTo(ClientRestController.class).slash(result.getOwner().getId())
+    Link linkOwner = linkTo(ClientRestController.class).slash(result.getClient().getId())
         .withSelfRel();
     result.add(linkAnimal);
-    result.getOwner().add(linkOwner);
+    result.getClient().add(linkOwner);
     return ResponseEntity.ok(result);
   }
 }

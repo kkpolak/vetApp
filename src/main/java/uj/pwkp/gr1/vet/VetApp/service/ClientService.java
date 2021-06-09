@@ -2,6 +2,7 @@ package uj.pwkp.gr1.vet.VetApp.service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,8 +54,10 @@ public class ClientService {
   }
 
   public List<Visit> getClientsVisits(int id) {
-    var client = getClientById(id);
-    return client.getVisits();
+//    var client = getClientById(id);
+    return visitRepository.findAll().stream()
+        .filter(v -> v.getClient().getId() == id).collect(
+            Collectors.toList());
   }
 
   public Client addClientsAnimal(int animalID, int clientID) {
@@ -86,34 +89,34 @@ public class ClientService {
     return c;
   }
 
-  public Client addClientsVisit(int visitID, int clientID) {
-    var visit = visitRepository.findById(visitID)
-        .orElseThrow(() -> {
-          String message = String
-              .format("Wrong visit  id: %s ", visitID);
-          log.error(message);
-          throw new ObjectNotFoundVetAppException(message,
-              VetAppResourceType.VISIT);
-        });
-    var client = getClientById(clientID);
-    var visits = client.getVisits();
-    visits.add(visit);
-    client.setVisits(visits);
-
-    Client c;
-    try {
-      c = clientRepository.save(client);
-    } catch (Exception e) {
-      String message = String.format(
-          "An attempt to add visit id: %s for client id: %s ",
-          visitID, clientID);
-      log.error(message);
-      throw new CreateVetAppException(message,
-          VetAppResourceType.CLIENT);
-    }
-
-    return c;
-  }
+//  public Client addClientsVisit(int visitID, int clientID) {
+//    var visit = visitRepository.findById(visitID)
+//        .orElseThrow(() -> {
+//          String message = String
+//              .format("Wrong visit  id: %s ", visitID);
+//          log.error(message);
+//          throw new ObjectNotFoundVetAppException(message,
+//              VetAppResourceType.VISIT);
+//        });
+//    var client = getClientById(clientID);
+//    var visits = client.getVisits();
+//    visits.add(visit);
+//    client.setVisits(visits);
+//
+//    Client c;
+//    try {
+//      c = clientRepository.save(client);
+//    } catch (Exception e) {
+//      String message = String.format(
+//          "An attempt to add visit id: %s for client id: %s ",
+//          visitID, clientID);
+//      log.error(message);
+//      throw new CreateVetAppException(message,
+//          VetAppResourceType.CLIENT);
+//    }
+//
+//    return c;
+//  }
 
   public Client createClient(ClientRequest req) {
     Client c;
@@ -123,7 +126,7 @@ public class ClientService {
           .firstName(req.getFirstName())
           .lastName(req.getLastName())
           .animals(Collections.emptyList())
-          .visits(Collections.emptyList())
+//          .visits(Collections.emptyList())
 //          .animals(animalList)
           .build());
     } catch (Exception e) {

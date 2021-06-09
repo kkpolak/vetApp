@@ -3,11 +3,14 @@ package uj.pwkp.gr1.vet.VetApp.entity;
 import java.time.LocalDateTime;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,9 +29,10 @@ public class Animal extends RepresentationModel<Animal> {
   private LocalDateTime dateOfBirth;
   private AnimalType type;
 
-  @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "owner_id", referencedColumnName = "id")
-  private Client owner;
+//  @OneToOne(cascade = CascadeType.ALL)
+//  @JoinColumn(name = "owner_id", referencedColumnName = "id")
+  @ManyToOne(fetch = FetchType.LAZY)
+  private Client client;
 
   protected Animal() {
     id = 0;

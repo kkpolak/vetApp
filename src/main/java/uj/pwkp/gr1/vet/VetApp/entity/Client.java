@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import lombok.AllArgsConstructor;
@@ -34,11 +35,15 @@ public class Client extends RepresentationModel<Client> {
     lastName = "-";
   }
 
-  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+  //  @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(targetEntity = Animal.class)
+  @JoinColumn(name = "animal")
   private List<Animal> animals = new ArrayList<>();
 
-  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<Visit> visits = new ArrayList<>();
+  //  @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+//  @OneToMany(targetEntity = Visit.class)
+//  @JoinColumn(name = "visit")
+//  private List<Visit> visits = new ArrayList<>();
 
 //  @OneToOne(mappedBy = "animal")
 //  Animal animal;
