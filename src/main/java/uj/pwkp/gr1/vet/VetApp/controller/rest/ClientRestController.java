@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uj.pwkp.gr1.vet.VetApp.controller.rest.request.ClientRequest;
+import uj.pwkp.gr1.vet.VetApp.entity.Animal;
 import uj.pwkp.gr1.vet.VetApp.entity.Client;
+import uj.pwkp.gr1.vet.VetApp.entity.Visit;
 import uj.pwkp.gr1.vet.VetApp.service.ClientService;
 
 @Slf4j
@@ -66,5 +68,23 @@ public class ClientRestController {
     Link linkClient = linkTo(ClientRestController.class).slash(id).withSelfRel();
     result.add(linkClient);
     return new ResponseEntity<>(result, HttpStatus.OK);
+  }
+
+  @GetMapping(path = "/animals/{id}")
+  public CollectionModel<Animal>  getClientsAnimals(@PathVariable Integer id) {
+    log.info("Getting client by id - controller");
+    var result = clientService.getClientsAnimals(id);
+    result.forEach(c -> c.add(linkTo(Animal.class).slash(c.getId()).withSelfRel()));
+    Link link = linkTo(AnimalRestController.class).withSelfRel();
+    return CollectionModel.of(result, link);
+  }
+
+  @GetMapping(path = "/visits/{id}")
+  public CollectionModel<Visit> getClientsVisits(@PathVariable Integer id) {
+    log.info("Getting client by id - controller");
+    var result = clientService.getClientsVisits(id);
+    result.forEach(c -> c.add(linkTo(Visit.class).slash(c.getId()).withSelfRel()));
+    Link link = linkTo(VisitsRestController.class).withSelfRel();
+    return CollectionModel.of(result, link);
   }
 }
