@@ -67,14 +67,14 @@ public class ClientService {
   }
 
   public List<Animal> getClientsAnimals(int id) {
-    var check = getClientById(id);
+    checkClient(id);
     return animalRepository.findAll().stream()
         .filter(a -> a.getOwner().getId() == id)
         .collect(Collectors.toList());
   }
 
   public List<Visit> getClientsVisits(int id) {
-    var check = getClientById(id);
+    checkClient(id);
     return visitRepository.findAll().stream()
         .filter(v -> v.getClient().getId() == id).collect(
             Collectors.toList());
@@ -93,5 +93,9 @@ public class ClientService {
       throw new DeleteVetAppException(message,
           VetAppResourceType.CLIENT);
     }
+  }
+
+  public void checkClient(int id){
+    var check = getClientById(id);
   }
 }
