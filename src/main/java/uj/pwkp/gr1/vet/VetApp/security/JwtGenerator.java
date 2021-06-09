@@ -21,7 +21,7 @@ public class JwtGenerator {
                 claim("login", userDetails.getUsername())
                 .claim("password", userDetails.getPassword())
                 .claim("role", userDetails.getAuthorities().stream().findFirst().get().getAuthority())
-                .expirationTime(new Date(new Date().getTime() + 60 * 1000))
+                .expirationTime(new Date(new Date().getTime() + 60 * 60 * 1000))
                 .build();
 
         SignedJWT signedJWT = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.HS256).type(JOSEObjectType.JWT).build(), jwtClaimsSet);

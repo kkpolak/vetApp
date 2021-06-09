@@ -1,7 +1,7 @@
 package uj.pwkp.gr1.vet.VetApp.entity;
 
 public enum UserRole {
-    USER,
+    USER,//client
     ADMIN,
     VET
 }
