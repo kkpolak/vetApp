@@ -63,7 +63,7 @@ public class VisitsRestController {
   }
 
   @PostMapping(path = "/create", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
-  public ResponseEntity<?> createVisit(@RequestBody VisitRequest visitReq) {
+  public ResponseEntity<Object> createVisit(@RequestBody VisitRequest visitReq) {
     log.info("Creating visit - controller");
     var result = visitsService.createVisit(visitReq);
     Link linkVisit = linkTo(VisitsRestController.class).slash(result.getId()).withSelfRel();
@@ -81,7 +81,7 @@ public class VisitsRestController {
   }
 
   @DeleteMapping(path = "/delete/{id}", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
-  public ResponseEntity<?> deleteVisit(@PathVariable int id) {
+  public ResponseEntity<Object> deleteVisit(@PathVariable int id) {
     log.info("Deleting visit - controller");
     var result = visitsService.delete(id);
     Link linkVisit = linkTo(VisitsRestController.class).slash(id).withSelfRel();
@@ -99,7 +99,7 @@ public class VisitsRestController {
   }
 
   @PatchMapping(path = "/update/{id}/{status}")
-  public ResponseEntity<?> updateStatus(@PathVariable("id") int id,
+  public ResponseEntity<Object> updateStatus(@PathVariable("id") int id,
       @PathVariable("status") String status) {
     Status newStatus;
     try {
@@ -114,19 +114,19 @@ public class VisitsRestController {
   }
 
   @PatchMapping(path = "/update/{vetId}/{visitId}/{status}")
-  public ResponseEntity<?> updateStatusByVet(@PathVariable("vetId") int vetId,
+  public ResponseEntity<Object> updateStatusByVet(@PathVariable("vetId") int vetId,
       @PathVariable("visitId") int visitId, @PathVariable("status") @Min(1) @Max(2) int status) {
     var result = visitsService.changeVisitStatus(vetId, visitId, status);
     log.info(String.format("Updated status of visit %s to: %s - controller", visitId, status));
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  private ResponseEntity<?> visitToResult(Visit visit) {
+  private ResponseEntity<Object> visitToResult(Visit visit) {
     return ResponseEntity.status(HttpStatus.CREATED).body(visit);
   }
 
   @PostMapping(path = "/search")
-  public ResponseEntity<?> searchTerms(@RequestBody SearchRequest searchRequest) {
+  public ResponseEntity<Object> searchTerms(@RequestBody SearchRequest searchRequest) {
     LocalDateTime start = searchRequest.getStartTime();
     LocalDateTime end = searchRequest.getEndTime();
     int officeId = searchRequest.getOfficeId();

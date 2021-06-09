@@ -31,7 +31,7 @@ public class ClientRestController {
   private ClientService clientService;
 
   @GetMapping(path = "/{id}", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
-  public ResponseEntity<?> getClient(@PathVariable int id) {
+  public ResponseEntity<Client> getClient(@PathVariable int id) {
     log.info("Getting client by id - controller");
     var result = clientService.getClientById(id);
     Link linkClient = linkTo(ClientRestController.class).slash(id).withSelfRel();
@@ -49,7 +49,7 @@ public class ClientRestController {
   }
 
   @PostMapping(path = "/create", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
-  public ResponseEntity<?> createClient(@RequestBody ClientRequest clientRequest) {
+  public ResponseEntity<Client> createClient(@RequestBody ClientRequest clientRequest) {
     log.info("Creating client - controller");
     var result = clientService.createClient(clientRequest);
     Link linkClient = linkTo(ClientRestController.class).slash(result.getId()).withSelfRel();
@@ -58,7 +58,7 @@ public class ClientRestController {
   }
 
   @DeleteMapping(path = "/delete/{id}", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
-  public ResponseEntity<?> deleteClient(@PathVariable int id) {
+  public ResponseEntity<Client> deleteClient(@PathVariable int id) {
     log.info("Deleting client - controller");
     var result = clientService.delete(id);
     Link linkClient = linkTo(ClientRestController.class).slash(id).withSelfRel();

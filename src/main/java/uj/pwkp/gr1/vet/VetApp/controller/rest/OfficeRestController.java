@@ -41,7 +41,7 @@ public class OfficeRestController {
   }
 
   @PostMapping(path = "/create", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
-  public ResponseEntity<?> createOffice(@RequestBody OfficeRequest officeRequest) {
+  public ResponseEntity<Office> createOffice(@RequestBody OfficeRequest officeRequest) {
     log.info("Creating office - controller");
     var result = officeService.createOffice(officeRequest);
     Link linkOffice = linkTo(OfficeRestController.class).slash(result.getId()).withSelfRel();
@@ -50,7 +50,7 @@ public class OfficeRestController {
   }
 
   @DeleteMapping(path = "/delete/{id}", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
-  public ResponseEntity<?> deleteOffice(@PathVariable int id) {
+  public ResponseEntity<Office> deleteOffice(@PathVariable int id) {
     log.info("Deleting office - controller");
     var result = officeService.deleteOffice(id);
     Link linkOffice = linkTo(OfficeRestController.class).slash(id).withSelfRel();

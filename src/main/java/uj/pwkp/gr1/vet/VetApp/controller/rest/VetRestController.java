@@ -68,7 +68,7 @@ public class VetRestController {
   }
 
   @PatchMapping(path = "update/{vetId}/{visitId}/{description}")
-  public ResponseEntity<?> updateStatusByVet(@PathVariable("vetId") int vetId,
+  public ResponseEntity<Object> updateStatusByVet(@PathVariable("vetId") int vetId,
       @PathVariable("visitId") int visitId,
       @PathVariable("description") @Size(min = 1) String description) {
     log.info("Updating status by vet - controller");
