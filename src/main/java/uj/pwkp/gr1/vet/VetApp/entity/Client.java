@@ -30,9 +30,4 @@ public class Client extends RepresentationModel<Client> {
     firstName = "-";
     lastName = "-";
   }
-
-  //private final List<Animal> animals;
-
-//  @OneToOne(mappedBy = "animal")
-//  Animal animal;
 }

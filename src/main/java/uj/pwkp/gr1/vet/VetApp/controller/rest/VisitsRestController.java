@@ -3,6 +3,7 @@ package uj.pwkp.gr1.vet.VetApp.controller.rest;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uj.pwkp.gr1.vet.VetApp.controller.rest.request.SearchRequest;
 import uj.pwkp.gr1.vet.VetApp.controller.rest.request.VisitRequest;
+import uj.pwkp.gr1.vet.VetApp.controller.rest.response.VisitResponseDto;
 import uj.pwkp.gr1.vet.VetApp.entity.Status;
 import uj.pwkp.gr1.vet.VetApp.entity.Visit;
 import uj.pwkp.gr1.vet.VetApp.service.VisitService;
@@ -35,89 +37,85 @@ public class VisitsRestController {
   private VisitService visitsService;
 
   @GetMapping(path = "/{id}", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
-  public ResponseEntity<?> getVisit(@PathVariable int id) {
+  public ResponseEntity<VisitResponseDto> getVisit(
+      @PathVariable int id) {
     log.info("Getting visit by id - controller");
-    var result = visitsService.getVisitById(id);
-    Link linkVisit = linkTo(VisitsRestController.class).slash(id).withSelfRel();
-    Link linkAnimal = linkTo(AnimalRestController.class).slash(result.getAnimal().getId())
+    var resultDAO = visitsService.getVisitById(id);
+    var result = new VisitResponseDto(resultDAO);
+    var linkVisit = linkTo(VisitsRestController.class).slash(id)
         .withSelfRel();
-    Link linkClient = linkTo(ClientRestController.class).slash(result.getClient().getId())
-        .withSelfRel();
-    Link linkVet = linkTo(VetRestController.class).slash(result.getVet().getId()).withSelfRel();
     result.add(linkVisit);
-    result.getAnimal().add(linkAnimal);
-    result.getClient().add(linkClient);
-    result.getVet().add(linkVet);
-
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
   @GetMapping(path = "/all", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
-  public CollectionModel<Visit> getAllVisits() {
+  public CollectionModel<VisitResponseDto> getAllVisits() {
     log.info("Getting all visits - controller");
-    var visits = visitsService.getAllVisits();
+    var visits = visitsService.getAllVisits().stream()
+        .map(VisitResponseDto::new).collect(
+            Collectors.toList());
     visits.forEach(
-        visit -> visit.add(linkTo(VisitsRestController.class).slash(visit.getId()).withSelfRel()));
-    Link link = linkTo(VisitsRestController.class).withSelfRel();
+        visit -> visit.add(
+            linkTo(VisitsRestController.class).slash(visit.getId())
+                .withSelfRel()));
+    var link = linkTo(VisitsRestController.class).withSelfRel();
     return CollectionModel.of(visits, link);
   }
 
   @PostMapping(path = "/create", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
-  public ResponseEntity<Object> createVisit(@RequestBody VisitRequest visitReq) {
+  public ResponseEntity<VisitResponseDto> createVisit(
+      @RequestBody VisitRequest visitReq) {
     log.info("Creating visit - controller");
-    var result = visitsService.createVisit(visitReq);
-    Link linkVisit = linkTo(VisitsRestController.class).slash(result.getId()).withSelfRel();
-    Link linkAnimal = linkTo(AnimalRestController.class).slash(result.getAnimal().getId())
-        .withSelfRel();
-    Link linkClient = linkTo(ClientRestController.class).slash(result.getClient().getId())
-        .withSelfRel();
-    Link linkVet = linkTo(VetRestController.class).slash(result.getVet().getId()).withSelfRel();
+    var resultDAO = visitsService.createVisit(visitReq);
+    var result = new VisitResponseDto(resultDAO);
+    Link linkVisit = linkTo(VisitsRestController.class)
+        .slash(result.getId()).withSelfRel();
     result.add(linkVisit);
-    result.getAnimal().add(linkAnimal);
-    result.getClient().add(linkClient);
-    result.getVet().add(linkVet);
-
-    return visitToResult(result);
+    return ResponseEntity.status(HttpStatus.CREATED).body(result);
   }
 
   @DeleteMapping(path = "/delete/{id}", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
-  public ResponseEntity<Object> deleteVisit(@PathVariable int id) {
+  public ResponseEntity<VisitResponseDto> deleteVisit(
+      @PathVariable int id) {
     log.info("Deleting visit - controller");
-    var result = visitsService.delete(id);
-    Link linkVisit = linkTo(VisitsRestController.class).slash(id).withSelfRel();
-    Link linkAnimal = linkTo(AnimalRestController.class).slash(result.getAnimal().getId())
+    var resultDAO = visitsService.delete(id);
+    var result = new VisitResponseDto(resultDAO);
+    Link linkVisit = linkTo(VisitsRestController.class).slash(id)
         .withSelfRel();
-    Link linkClient = linkTo(ClientRestController.class).slash(result.getClient().getId())
-        .withSelfRel();
-    Link linkVet = linkTo(VetRestController.class).slash(result.getVet().getId()).withSelfRel();
     result.add(linkVisit);
-    result.getAnimal().add(linkAnimal);
-    result.getClient().add(linkClient);
-    result.getVet().add(linkVet);
 
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
   @PatchMapping(path = "/update/{id}/{status}")
-  public ResponseEntity<Object> updateStatus(@PathVariable("id") int id,
+  public ResponseEntity<Object> updateStatus(
+      @PathVariable("id") int id,
       @PathVariable("status") String status) {
     Status newStatus;
     try {
       newStatus = Status.valueOf(status);
     } catch (Exception e) {
       log.error("Unknown status");
-      return ResponseEntity.badRequest().body("{\"reason\": \"Unknown status\"}");
+      return ResponseEntity.badRequest()
+          .body("{\"reason\": \"Unknown status\"}");
     }
     var result = visitsService.updateVisitStatus(id, newStatus);
-    log.info(String.format("Updated status of visit %s to: %s - controller", id, status));
+    log.info(String
+        .format("Updated status of visit %s to: %s - controller", id,
+            status));
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
   @PatchMapping(path = "/update/{vetId}/{visitId}/{status}")
-  public ResponseEntity<Object> updateStatusByVet(@PathVariable("vetId") int vetId,
-      @PathVariable("visitId") int visitId, @PathVariable("status") @Min(1) @Max(2) int status) {
-    var result = visitsService.changeVisitStatus(vetId, visitId, status);
-    log.info(String.format("Updated status of visit %s to: %s - controller", visitId, status));
+  public ResponseEntity<Object> updateStatusByVet(
+      @PathVariable("vetId") int vetId,
+      @PathVariable("visitId") int visitId,
+      @PathVariable("status") @Min(1) @Max(2) int status) {
+    var result = visitsService
+        .changeVisitStatus(vetId, visitId, status);
+    log.info(String
+        .format("Updated status of visit %s to: %s - controller",
+            visitId, status));
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
@@ -126,13 +124,17 @@ public class VisitsRestController {
   }
 
   @PostMapping(path = "/search")
-  public ResponseEntity<Object> searchTerms(@RequestBody SearchRequest searchRequest) {
+  public ResponseEntity<Object> searchTerms(
+      @RequestBody SearchRequest searchRequest) {
     LocalDateTime start = searchRequest.getStartTime();
     LocalDateTime end = searchRequest.getEndTime();
     int officeId = searchRequest.getOfficeId();
     int vetId = searchRequest.getVetId();
-    var terms = visitsService.searchTerms(start, end, officeId, vetId);
-    log.info(String.format("In searching terms functionality found following %s", terms.toString()));
+    var terms = visitsService
+        .searchTerms(start, end, officeId, vetId);
+    log.info(String
+        .format("In searching terms functionality found following %s",
+            terms.toString()));
     return ResponseEntity.status(HttpStatus.CREATED).body(terms);
   }
 }

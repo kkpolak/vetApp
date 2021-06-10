@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uj.pwkp.gr1.vet.VetApp.controller.rest.request.CreateUserRequest;
-import uj.pwkp.gr1.vet.VetApp.controller.rest.response.UserResponse;
+import uj.pwkp.gr1.vet.VetApp.controller.rest.response.UserResponseDto;
 import uj.pwkp.gr1.vet.VetApp.service.UserDetailsServiceImpl;
 
 import java.util.List;
@@ -23,7 +23,7 @@ public class UserController {
     }
 
     @GetMapping
-    public List<UserResponse> getAllUsers() {
+    public List<UserResponseDto> getAllUsers() {
         log.info("Getting all users - controller");
         return userDetailsService.getAllUsers();
     }
@@ -33,7 +33,7 @@ public class UserController {
         log.info("Creating user - controller");
         var result = userDetailsService.createUser(userRequest);
         return new ResponseEntity<>(
-                new UserResponse(result.getUsername(), result.getRole().name()),
+                new UserResponseDto(result),
                 HttpStatus.CREATED);
     }
 
