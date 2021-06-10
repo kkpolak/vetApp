@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import uj.pwkp.gr1.vet.VetApp.controller.rest.request.CreateUserRequest;
-import uj.pwkp.gr1.vet.VetApp.controller.rest.response.UserResponse;
+import uj.pwkp.gr1.vet.VetApp.controller.rest.response.UserResponseDto;
 import uj.pwkp.gr1.vet.VetApp.entity.User;
 import uj.pwkp.gr1.vet.VetApp.entity.UserRole;
 import uj.pwkp.gr1.vet.VetApp.exception.VetAppResourceType;
@@ -23,53 +23,64 @@ import java.util.stream.StreamSupport;
 @Slf4j
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    public UserDetailsServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
+  private final UserRepository userRepository;
+  private final PasswordEncoder passwordEncoder;
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
-        if (user != null) {
-            return user;
-        }
-        throw new UsernameNotFoundException("User '" + username + "' not found");
-    }
+  @Autowired
+  public UserDetailsServiceImpl(UserRepository userRepository,
+      PasswordEncoder passwordEncoder) {
+    this.userRepository = userRepository;
+    this.passwordEncoder = passwordEncoder;
+  }
 
-    public User createUser(CreateUserRequest userRequest) {
-        if (userRepository.findByUsername(userRequest.getUsername()) != null) {
-            throw new CreateVetAppException("Username is taken.", VetAppResourceType.USER);
-        }
-        UserRole userRole;
-        try {
-            userRole = UserRole.valueOf(userRequest.getRole());
-        } catch (IllegalArgumentException e) {
-            throw new CreateVetAppException("Wrong role name.", VetAppResourceType.USER);
-        }
-        String username = userRequest.getUsername();
-        String password = userRequest.getPassword();
-        String passwd = passwordEncoder.encode(password);
-        return userRepository.save(User.newUser(username, passwd, userRole));
+  @Override
+  public UserDetails loadUserByUsername(String username)
+      throws UsernameNotFoundException {
+    User user = userRepository.findByUsername(username);
+    if (user != null) {
+      return user;
     }
+    throw new UsernameNotFoundException(
+        "User '" + username + "' not found");
+  }
 
-    public List<UserResponse> getAllUsers() {
-        log.info("Getting all users - service");
-        var users = StreamSupport.stream(userRepository.findAll().spliterator(), false)
-                .collect(Collectors.toList());
-        return users.stream()
-                .map(user -> new UserResponse(user.getUsername(), user.getRole().name()))
-                .collect(Collectors.toList());
+  public User createUser(CreateUserRequest userRequest) {
+    if (userRepository.findByUsername(userRequest.getUsername())
+        != null) {
+      throw new CreateVetAppException("Username is taken.",
+          VetAppResourceType.USER);
     }
+    UserRole userRole;
+    try {
+      userRole = UserRole.valueOf(userRequest.getRole());
+    } catch (IllegalArgumentException e) {
+      throw new CreateVetAppException("Wrong role name.",
+          VetAppResourceType.USER);
+    }
+    String username = userRequest.getUsername();
+    String password = userRequest.getPassword();
+    String passwd = passwordEncoder.encode(password);
+    return userRepository
+        .save(User.newUser(username, passwd, userRole));
+  }
 
-    public UserResponse deleteUser(long id) {
-        var user = userRepository.findById(id)
-                .orElseThrow(() -> new DeleteVetAppException("User with that id doesn't exist", VetAppResourceType.USER));
-        userRepository.delete(user);
-        return new UserResponse(user.getUsername(), user.getRole().name());
-    }
+  public List<UserResponseDto> getAllUsers() {
+    log.info("Getting all users - service");
+    var users = StreamSupport
+        .stream(userRepository.findAll().spliterator(), false)
+        .collect(Collectors.toList());
+    return users.stream()
+        .map(UserResponseDto::new)
+        .collect(Collectors.toList());
+  }
+
+  public UserResponseDto deleteUser(long id) {
+    var user = userRepository.findById(id)
+        .orElseThrow(() -> new DeleteVetAppException(
+            "User with that id doesn't exist",
+            VetAppResourceType.USER));
+    userRepository.delete(user);
+    return new UserResponseDto(user);
+  }
 }
