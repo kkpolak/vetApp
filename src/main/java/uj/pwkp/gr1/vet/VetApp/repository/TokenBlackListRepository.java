@@ -7,6 +7,4 @@ import uj.pwkp.gr1.vet.VetApp.entity.TokenBlackList;
 @Repository
 public interface TokenBlackListRepository extends JpaRepository<TokenBlackList, Integer> {
     TokenBlackList findTokenBlackListByTokenEquals(String token);
-
-    boolean existsTokenBlackListByToken(String token);
 }

@@ -20,12 +20,13 @@ import uj.pwkp.gr1.vet.VetApp.repository.ClientRepository;
 @Slf4j
 @Service
 public class AnimalService {
+  private final AnimalRepository animalRepository;
+  private final ClientService clientService;
 
-  @Autowired
-  private AnimalRepository animalRepository;
-
-  @Autowired
-  private ClientService clientService;
+  public AnimalService(AnimalRepository animalRepository, ClientService clientService) {
+    this.animalRepository = animalRepository;
+    this.clientService = clientService;
+  }
 
   public List<Animal> getAllAnimals() {
     log.info("Getting all animals - service");

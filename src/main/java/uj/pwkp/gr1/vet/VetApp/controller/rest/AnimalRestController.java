@@ -25,8 +25,12 @@ import uj.pwkp.gr1.vet.VetApp.service.AnimalService;
 @RequestMapping(path = "/api/animals")
 public class AnimalRestController {
 
+  private final AnimalService animalService;
+
   @Autowired
-  private AnimalService animalService;
+  public AnimalRestController(AnimalService animalService) {
+    this.animalService = animalService;
+  }
 
   @GetMapping(path = "/{id}", produces = MediaTypes.HAL_FORMS_JSON_VALUE)
   public ResponseEntity<AnimalResponseDto> getAnimalById(

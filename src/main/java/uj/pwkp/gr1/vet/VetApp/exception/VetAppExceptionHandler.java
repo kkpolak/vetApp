@@ -98,7 +98,7 @@ public class VetAppExceptionHandler {
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<String> handleException(Exception ex) {
-    log.warn("UNUSUAL EXCEPTION");
+    log.warn("UNUSUAL EXCEPTION:" + ex.getMessage());
     return ResponseEntity
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .body("Exception: " + ex.getLocalizedMessage());
